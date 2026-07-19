@@ -96,6 +96,43 @@ public class BinderPageController : ControllerBase
 
     //put /api/binderpage/{id}
 
+    [HttpPut("{id}")]
+    [Authorize]
+
+    public IActionResult Update(int id, CreateBinderPageDTO dto)
+    {
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
+        if (profile == null) return NotFound();
+
+        var binderPage = _dbContext.BinderPages.SingleOrDefault(bp => bp.Id == id);
+        if (binderPage == null) return NotFound();
+        if (binderPage.UserProfileId != profile.Id) return NotFound();
+
+        binderPage.Title = dto.Title;
+        _dbContext.SaveChanges();
+
+        return NoContent();
+
+    }
+
     //delete /api/binderpage/{id}
+
+    [HttpDelete("{id}")]
+    [Authorize]
+    public IActionResult Delete(int id)
+    {
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
+        if (profile == null) return NotFound();
+
+        var binderPage = _dbContext.BinderPages.SingleOrDefault(bp => bp.Id == id);
+        if (binderPage == null) return NotFound();
+        if (binderPage.UserProfileId != profile.Id) return NotFound();
+
+        _dbContext.BinderPages.Remove(binderPage);
+        _dbContext.SaveChanges();
+        return NoContent();
+    }
 
 }
