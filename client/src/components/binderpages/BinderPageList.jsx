@@ -11,7 +11,8 @@ export default function BinderPageList() {
     loadBinderPages();
   }, []);
 
-  const handleDelete = (id) => {
+  const handleDelete = (id, title) => {
+    if (!window.confirm(`Delete "${title}"? This can't be undone.`)) return;
     deleteBinderPage(id).then(loadBinderPages);
   };
 
@@ -44,7 +45,7 @@ export default function BinderPageList() {
               <td className="border-b py-2 text-right">
                 <button
                   className="px-2 py-1 rounded border border-red-600 text-red-600 hover:bg-red-50 text-sm"
-                  onClick={() => handleDelete(bp.id)}
+                  onClick={() => handleDelete(bp.id, bp.title)}
                 >
                   Delete
                 </button>
