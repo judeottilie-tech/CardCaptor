@@ -1,18 +1,21 @@
 import { Route, Routes } from 'react-router-dom'
-import AuthorizedRoute from './auth/AuthorizedRoute'
+import { AuthorizedRoute } from './auth/AuthorizedRoute'
 import Login from './auth/Login'
 import Register from './auth/Register'
 import BinderPageList from './binderpages/BinderPageList'
 import BinderPageDetail from './binderpages/BinderPageDetail'
 import CreateBinderPage from './binderpages/CreateBinderPage'
 
-export default function ApplicationViews() {
+export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
     <Routes>
       <Route
         index
         element={
-          <AuthorizedRoute>
+          <AuthorizedRoute
+            loggedInUser={loggedInUser}
+            setLoggedInUser={setLoggedInUser}
+          >
             <BinderPageList />
           </AuthorizedRoute>
         }
@@ -20,7 +23,10 @@ export default function ApplicationViews() {
       <Route
         path="binderpages/create"
         element={
-          <AuthorizedRoute>
+          <AuthorizedRoute
+            loggedInUser={loggedInUser}
+            setLoggedInUser={setLoggedInUser}
+          >
             <CreateBinderPage />
           </AuthorizedRoute>
         }
@@ -28,14 +34,23 @@ export default function ApplicationViews() {
       <Route
         path="binderpages/:id"
         element={
-          <AuthorizedRoute>
+          <AuthorizedRoute
+            loggedInUser={loggedInUser}
+            setLoggedInUser={setLoggedInUser}
+          >
             <BinderPageDetail />
           </AuthorizedRoute>
         }
       />
-      <Route path="login" element={<Login />} />
-      <Route path="register" element={<Register />} />
+      <Route
+        path="login"
+        element={<Login setLoggedInUser={setLoggedInUser} />}
+      />
+      <Route
+        path="register"
+        element={<Register setLoggedInUser={setLoggedInUser} />}
+      />
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
     </Routes>
-  )
+  );
 }
