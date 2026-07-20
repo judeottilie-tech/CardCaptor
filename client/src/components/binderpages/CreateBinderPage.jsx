@@ -9,8 +9,8 @@ export default function CreateBinderPage() {
   const handleCreateBinderPage = (event) => {
     event.preventDefault();
     const newBinderPage = { title };
-    createBinderPage(newBinderPage).then(() => {
-      navigate("/");
+    createBinderPage(newBinderPage).then((created) => {
+      navigate(`/binderpages/${created.id}`);
     });
   };
 

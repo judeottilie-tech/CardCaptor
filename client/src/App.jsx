@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import './App.css'
 import NavBar from './components/NavBar'
 import ApplicationViews from './components/ApplicationViews'
 import { tryGetLoggedInUser } from './managers/authManager'
