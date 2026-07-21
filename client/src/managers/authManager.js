@@ -20,8 +20,8 @@ export const logout = () => {
     return fetch(_apiUrl + "/logout");
 };
 
-export const tryGetLoggedInUser = () => {
-    return fetch(_apiUrl + "/me").then((res) => {
+export const tryGetLoggedInUser = (signal) => {
+    return fetch(_apiUrl + "/me", { signal }).then((res) => {
         return res.status === 401 ? Promise.resolve(null) : res.json();
     });
 };
