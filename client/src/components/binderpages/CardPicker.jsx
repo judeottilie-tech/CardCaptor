@@ -5,7 +5,13 @@ export default function CardPicker({ onPick, onClose }) {
   const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    getCards().then(setCards) 
+    const controller = new AbortController();
+    getCards(controller.signal)
+      .then(setCards)
+      .catch((err) => {
+        if (err.name !== "AbortError") throw err;
+      });
+    return () => controller.abort();
   }, []);
 
   return (
@@ -28,7 +34,7 @@ export default function CardPicker({ onPick, onClose }) {
               key={card.id}
               src={card.imageUrl}
               alt={card.name}
-              onClick={() => onPick(card.id)}
+              onClick={() => onPick(card)}
               className="cursor-pointer hover:opacity-75"
             />
           ))}

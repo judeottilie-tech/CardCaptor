@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   getBinderPageById,
   updateBinderPage,
@@ -13,20 +13,29 @@ export default function BinderPageDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [binderPage, setBinderPage] = useState(null);
+  const [binderPage, setBinderPage] = useState();
+  const [pendingSlots, setPendingSlots] = useState([]);
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [justSaved, setJustSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const loadBinderPage = () => {
-    getBinderPageById(id).then((bp) => {
+  const loadBinderPage = (signal) => {
+    return getBinderPageById(id, signal).then((bp) => {
       setBinderPage(bp);
-      setNewTitle(bp.title);
+      if (bp) {
+        setNewTitle(bp.title);
+        setPendingSlots(bp.binderPageCardSlots);
+      }
     });
   };
 
   useEffect(() => {
-    loadBinderPage()
+    const controller = new AbortController();
+    loadBinderPage(controller.signal).catch((err) => {
+      if (err.name !== "AbortError") throw err;
+    });
+    return () => controller.abort();
   }, [id]);
 
   const handleSelectSlot = (slotId) => {
@@ -37,15 +46,17 @@ export default function BinderPageDetail() {
     setSelectedSlotId(null);
   };  
 
-  const handlePickCard = (cardId) => {
-    attachCard(selectedSlotId, cardId).then(() => {
-      loadBinderPage();
-      setSelectedSlotId(null);
-    });
+  const handlePickCard = (card) => {
+    setPendingSlots((slots) =>
+      slots.map((s) => (s.id === selectedSlotId ? { ...s, cardId: card.id, card } : s)),
+    );
+    setSelectedSlotId(null);
   };
 
   const handleRemoveCard = (slotId) => {
-    removeCard(slotId).then(loadBinderPage)
+    setPendingSlots((slots) =>
+      slots.map((s) => (s.id === slotId ? { ...s, cardId: null, card: null } : s)),
+    );
   };
 
   const handleDeleteBinder = () => {
@@ -55,19 +66,40 @@ export default function BinderPageDetail() {
 
   const handleUpdateBinder = (e) => {
     e.preventDefault();
-    updateBinderPage(binderPage.id, { title: newTitle }).then(() => {
-      loadBinderPage();
-      setJustSaved(true);
-      setTimeout(() => setJustSaved(false), 1500);
-    });
+    setSaving(true);
+
+    const slotUpdates = pendingSlots
+      .filter((slot) => {
+        const original = binderPage.binderPageCardSlots.find((s) => s.id === slot.id);
+        return original.cardId !== slot.cardId;
+      })
+      .map((slot) => (slot.cardId ? attachCard(slot.id, slot.cardId) : removeCard(slot.id)));
+
+    Promise.all([updateBinderPage(binderPage.id, { title: newTitle }), ...slotUpdates]).then(
+      () => {
+        setSaving(false);
+        loadBinderPage();
+        setJustSaved(true);
+        setTimeout(() => setJustSaved(false), 1500);
+      },
+    );
   };
 
 
-  if (!binderPage) return <p>Loading...</p>;
+  if (binderPage === undefined) return <p>Loading...</p>;
 
-  const sortedSlots = [...binderPage.binderPageCardSlots].sort(
-    (a, b) => a.position - b.position,
-  );
+  if (binderPage === null) {
+    return (
+      <div className="max-w-2xl mx-auto mt-8 px-4 text-center">
+        <p className="text-lg mb-4">Binder page not found.</p>
+        <Link to="/" className="text-blue-600 hover:underline">
+          Back to My Binder Pages
+        </Link>
+      </div>
+    );
+  }
+
+  const sortedSlots = [...pendingSlots].sort((a, b) => a.position - b.position);
 
   return (
     <div className="max-w-2xl mx-auto mt-8 px-4">
@@ -79,8 +111,12 @@ export default function BinderPageDetail() {
           className="text-xl font-bold border rounded px-2 py-1 flex-1 min-w-0"
         />
         <div className="flex items-center gap-2">
-          <button type="submit" className="flex-1 sm:flex-none px-3 py-1 rounded bg-blue-500 text-white">
-            Save
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex-1 sm:flex-none px-3 py-1 rounded bg-blue-500 text-white disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save"}
           </button>
           <button
             type="button"

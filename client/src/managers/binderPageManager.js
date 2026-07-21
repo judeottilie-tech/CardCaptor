@@ -1,15 +1,16 @@
 const _apiUrl = "/api/binderpage";
 
-export const getBinderPages = () => {
-  return fetch(_apiUrl, { credentials: "same-origin" }).then((res) =>
+export const getBinderPages = (signal) => {
+  return fetch(_apiUrl, { credentials: "same-origin", signal }).then((res) =>
     res.json(),
   );
 };
 
-export const getBinderPageById = (id) => {
-  return fetch(`${_apiUrl}/${id}`, { credentials: "same-origin" }).then((res) =>
-    res.json(),
-  );
+export const getBinderPageById = (id, signal) => {
+  return fetch(`${_apiUrl}/${id}`, { credentials: "same-origin", signal }).then((res) => {
+    if (!res.ok) return null;
+    return res.json();
+  });
 };
 
 export const createBinderPage = (binderPage) => {

@@ -7,9 +7,13 @@ function App() {
   const [loggedInUser, setLoggedInUser] = useState();
 
   useEffect(() => {
-    tryGetLoggedInUser().then((user) => {
-      setLoggedInUser(user);
-    });
+    const controller = new AbortController();
+    tryGetLoggedInUser(controller.signal)
+      .then((user) => setLoggedInUser(user))
+      .catch((err) => {
+        if (err.name !== "AbortError") throw err;
+      });
+    return () => controller.abort();
   }, []);
 
   if (loggedInUser === undefined) {

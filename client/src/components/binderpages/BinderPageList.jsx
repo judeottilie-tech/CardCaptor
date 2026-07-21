@@ -5,15 +5,19 @@ import { getBinderPages, deleteBinderPage } from "../../managers/binderPageManag
 export default function BinderPageList() {
   const [binderPages, setBinderPages] = useState([]);
 
-  const loadBinderPages = () => getBinderPages().then(setBinderPages);
+  const loadBinderPages = (signal) => getBinderPages(signal).then(setBinderPages);
 
   useEffect(() => {
-    loadBinderPages();
+    const controller = new AbortController();
+    loadBinderPages(controller.signal).catch((err) => {
+      if (err.name !== "AbortError") throw err;
+    });
+    return () => controller.abort();
   }, []);
 
   const handleDelete = (id, title) => {
     if (!window.confirm(`Delete "${title}"? This can't be undone.`)) return;
-    deleteBinderPage(id).then(loadBinderPages);
+    deleteBinderPage(id).then(() => loadBinderPages());
   };
 
   return (
@@ -27,33 +31,39 @@ export default function BinderPageList() {
           + New Binder Page
         </Link>
       </div>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr>
-            <th className="text-left border-b py-2">Title</th>
-            <th className="border-b py-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {binderPages.map((bp) => (
-            <tr key={bp.id}>
-              <td className="border-b py-2">
-                <Link to={`/binderpages/${bp.id}`} className="text-blue-600 hover:underline">
-                  {bp.title}
-                </Link>
-              </td>
-              <td className="border-b py-2 text-right">
-                <button
-                  className="px-2 py-1 rounded border border-red-600 text-red-600 hover:bg-red-50 text-sm"
-                  onClick={() => handleDelete(bp.id, bp.title)}
-                >
-                  Delete
-                </button>
-              </td>
+      {binderPages.length === 0 ? (
+        <p className="text-slate-500">
+          You don't have any binder pages yet — create one to get started.
+        </p>
+      ) : (
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="text-left border-b py-2">Title</th>
+              <th className="border-b py-2"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {binderPages.map((bp) => (
+              <tr key={bp.id}>
+                <td className="border-b py-2">
+                  <Link to={`/binderpages/${bp.id}`} className="text-blue-600 hover:underline">
+                    {bp.title}
+                  </Link>
+                </td>
+                <td className="border-b py-2 text-right">
+                  <button
+                    className="px-2 py-1 rounded border border-red-600 text-red-600 hover:bg-red-50 text-sm"
+                    onClick={() => handleDelete(bp.id, bp.title)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }
