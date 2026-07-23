@@ -44,7 +44,7 @@ namespace CardCaptor.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("BinderPages");
+                    b.ToTable("BinderPages", (string)null);
 
                     b.HasData(
                         new
@@ -79,7 +79,7 @@ namespace CardCaptor.Migrations
 
                     b.HasIndex("CardId");
 
-                    b.ToTable("BinderPageCardSlots");
+                    b.ToTable("BinderPageCardSlots", (string)null);
 
                     b.HasData(
                         new
@@ -160,7 +160,7 @@ namespace CardCaptor.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cards");
+                    b.ToTable("Cards", (string)null);
 
                     b.HasData(
                         new
@@ -485,7 +485,7 @@ namespace CardCaptor.Migrations
 
                     b.HasIndex("IdentityUserId");
 
-                    b.ToTable("UserProfiles");
+                    b.ToTable("UserProfiles", (string)null);
 
                     b.HasData(
                         new

@@ -7,16 +7,13 @@ namespace CardCaptor.Data;
 
 public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
 {
-    private readonly IConfiguration _configuration;
-
     public DbSet<UserProfile> UserProfiles { get; set; }
     public DbSet<BinderPage> BinderPages { get; set; }
     public DbSet<Card> Cards { get; set; }
     public DbSet<BinderPageCardSlot> BinderPageCardSlots { get; set; }
 
-    public CardCaptorDbContext(DbContextOptions<CardCaptorDbContext> context, IConfiguration config) : base(context)
+    public CardCaptorDbContext(DbContextOptions<CardCaptorDbContext> context) : base(context)
     {
-        _configuration = config;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,7 +25,9 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
             UserName = "Administrator",
             Email = "admin@cardcaptor.comx",
-            PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, _configuration["AdminPassword"])
+            ConcurrencyStamp = "1ac5ed5e-321b-43a5-b5cf-601f116f2bc8",
+            SecurityStamp = "d0421a93-dfa7-4b35-9b06-c6254a3482cc",
+            PasswordHash = "AQAAAAIAAYagAAAAELeRD5li3MF+nAJ9iMNI/VKQbd5ZG9hmkK4GCTB98QQA5rRUAustisDll7qQJ6r8Gw=="
         });
 
         modelBuilder.Entity<UserProfile>().HasData(new UserProfile
@@ -43,7 +42,9 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             Id = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
             UserName = "DemoUser",
             Email = "demo@cardcaptor.comx",
-            PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, "Demo1234")
+            ConcurrencyStamp = "d589739e-9dd7-4586-b3ad-47e17346df25",
+            SecurityStamp = "156d41da-d344-4a10-9d95-31e08decba92",
+            PasswordHash = "AQAAAAIAAYagAAAAEGfhBSqTZy9X/pudDnRxhjAEo35uUukm2f8FNovsAAIPDt8ZrtzYacz3fdrAQicxgw=="
         });
 
         modelBuilder.Entity<UserProfile>().HasData(new UserProfile
