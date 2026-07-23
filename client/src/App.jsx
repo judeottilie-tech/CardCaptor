@@ -11,7 +11,7 @@ function App() {
     tryGetLoggedInUser(controller.signal)
       .then((user) => setLoggedInUser(user))
       .catch((err) => {
-        if (err.name !== "AbortError") throw err;
+        if (err.name !== "AbortError") setLoggedInUser(null);
       });
     return () => controller.abort();
   }, []);
