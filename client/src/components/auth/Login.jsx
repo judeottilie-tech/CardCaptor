@@ -20,6 +20,12 @@ export default function Login({ setLoggedInUser }) {
     });
   };
 
+  const fillDemoAccount = () => {
+    setFailedLogin(false);
+    setUserName("DemoUser");
+    setPassword("Demo1234");
+  };
+
   const inputClass = (invalid) =>
     `w-full border rounded px-3 py-2 ${invalid ? "border-red-500" : "border-slate-300"}`;
 
@@ -57,6 +63,13 @@ export default function Login({ setLoggedInUser }) {
         onClick={handleSubmit}
       >
         Login
+      </button>
+      <button
+        type="button"
+        className="px-4 py-2 rounded border border-slate-300 hover:bg-slate-100 ml-2"
+        onClick={fillDemoAccount}
+      >
+        Try Demo
       </button>
       <p className="mt-4">
         Not signed up? Register <Link to="/register">here</Link>

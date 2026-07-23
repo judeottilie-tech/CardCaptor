@@ -38,6 +38,42 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             DisplayName = "Administrator"
         });
 
+        modelBuilder.Entity<IdentityUser>().HasData(new IdentityUser
+        {
+            Id = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
+            UserName = "DemoUser",
+            Email = "demo@cardcaptor.comx",
+            PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(null, "Demo1234")
+        });
+
+        modelBuilder.Entity<UserProfile>().HasData(new UserProfile
+        {
+            Id = 2,
+            IdentityUserId = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
+            DisplayName = "Demo User"
+        });
+
+        modelBuilder.Entity<BinderPage>().HasData(new BinderPage
+        {
+            Id = 1,
+            Title = "Demo Binder",
+            CreatedAt = new DateTime(2026, 7, 23),
+            UserProfileId = 2
+        });
+
+        modelBuilder.Entity<BinderPageCardSlot>().HasData(new BinderPageCardSlot[]
+        {
+            new BinderPageCardSlot { Id = 1, Position = 1, BinderPageId = 1, CardId = 4 },
+            new BinderPageCardSlot { Id = 2, Position = 2, BinderPageId = 1, CardId = 15 },
+            new BinderPageCardSlot { Id = 3, Position = 3, BinderPageId = 1, CardId = 2 },
+            new BinderPageCardSlot { Id = 4, Position = 4, BinderPageId = 1, CardId = 10 },
+            new BinderPageCardSlot { Id = 5, Position = 5, BinderPageId = 1, CardId = null },
+            new BinderPageCardSlot { Id = 6, Position = 6, BinderPageId = 1, CardId = null },
+            new BinderPageCardSlot { Id = 7, Position = 7, BinderPageId = 1, CardId = null },
+            new BinderPageCardSlot { Id = 8, Position = 8, BinderPageId = 1, CardId = null },
+            new BinderPageCardSlot { Id = 9, Position = 9, BinderPageId = 1, CardId = null },
+        });
+
         modelBuilder.Entity<Card>().HasData(new Card[]
         {
             new Card { Id = 1, Name = "Alakazam", ImageUrl = "https://tcg.one/scans/l/base_set/1.jpg" },
