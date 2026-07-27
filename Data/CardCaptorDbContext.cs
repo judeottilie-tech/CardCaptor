@@ -35,7 +35,11 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
         {
             Id = 1,
             IdentityUserId = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
-            DisplayName = "Administrator"
+            DisplayName = "Administrator",
+            StarterPokemon = "Bulbasaur",
+            PetFeedCount = 0,
+            PetFullness = 100,
+            PetLastFedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc)
         });
 
         modelBuilder.Entity<Card>().HasIndex(c => c.SourceId).IsUnique();

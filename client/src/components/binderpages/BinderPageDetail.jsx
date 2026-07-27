@@ -92,7 +92,10 @@ export default function BinderPageDetail() {
     return (
       <div className="max-w-2xl mx-auto mt-8 px-4 text-center">
         <p className="text-lg mb-4">Binder page not found.</p>
-        <Link to="/" className="text-blue-600 hover:underline">
+        <Link
+          to="/"
+          className="text-brand-ink underline decoration-brand-periwinkle/50 hover:text-brand-periwinkle"
+        >
           Back to My Binder Pages
         </Link>
       </div>
@@ -103,18 +106,21 @@ export default function BinderPageDetail() {
 
   return (
     <div className="max-w-2xl mx-auto mt-8 px-4">
-      <form onSubmit={handleUpdateBinder} className="flex flex-col sm:flex-row gap-2 mb-4">
+      <form
+        onSubmit={handleUpdateBinder}
+        className="flex flex-col sm:flex-row gap-2 mb-4"
+      >
         <input
           type="text"
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          className="text-xl font-bold border rounded px-2 py-1 flex-1 min-w-0"
+          className="font-heading text-xl font-bold border border-brand-periwinkle/40 rounded px-2 py-1 flex-1 min-w-0 focus:outline-none focus:border-brand-rose"
         />
         <div className="flex items-center gap-2">
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 sm:flex-none px-3 py-1 rounded bg-blue-500 text-white disabled:opacity-50"
+            className="flex-1 sm:flex-none px-3 py-1 rounded bg-brand-rose text-brand-ink font-semibold disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>
@@ -128,7 +134,6 @@ export default function BinderPageDetail() {
           {justSaved && <span className="text-green-600 text-sm">Saved</span>}
         </div>
       </form>
-
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         {sortedSlots.map((slot) => (
           <CardSlot

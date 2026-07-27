@@ -68,12 +68,12 @@ export default function CardPicker({ onPick, onClose }) {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search cards..."
-            className="flex-1 border rounded px-3 py-2"
+            className="flex-1 border border-brand-periwinkle/40 rounded px-3 py-2 focus:outline-none focus:border-brand-rose"
           />
           <select
             value={category}
             onChange={handleCategoryChange}
-            className="border rounded px-3 py-2"
+            className="border border-brand-periwinkle/40 rounded px-3 py-2 focus:outline-none focus:border-brand-rose"
           >
             <option value="">All categories</option>
             <option value="Pokemon">Pokemon</option>
@@ -83,14 +83,14 @@ export default function CardPicker({ onPick, onClose }) {
         </div>
 
         {loading ? (
-          <p className="text-center py-8 text-slate-500">Loading...</p>
+          <p className="text-center py-8 text-brand-ink/60">Loading...</p>
         ) : (
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             {cards.map((card) => (
               <div key={card.id} className="relative">
                 {!loadedIds.has(card.id) && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-slate-100 rounded">
-                    <span className="animate-spin h-5 w-5 border-2 border-slate-400 border-t-transparent rounded-full" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-brand-blush/25 rounded">
+                    <span className="animate-spin h-5 w-5 border-2 border-brand-periwinkle/50 border-t-transparent rounded-full" />
                   </div>
                 )}
                 <img
@@ -101,7 +101,7 @@ export default function CardPicker({ onPick, onClose }) {
                   }
                   onClick={() => setSelectedCard(card)}
                   className={`cursor-pointer hover:opacity-75 ${
-                    selectedCard?.id === card.id ? "ring-4 ring-blue-500" : ""
+                    selectedCard?.id === card.id ? "ring-4 ring-brand-rose" : ""
                   }`}
                 />
               </div>
@@ -113,7 +113,7 @@ export default function CardPicker({ onPick, onClose }) {
           <button
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
-            className="px-3 py-1 border rounded disabled:opacity-40"
+            className="px-3 py-1 border border-brand-periwinkle/40 rounded disabled:opacity-40"
           >
             Prev
           </button>
@@ -124,8 +124,10 @@ export default function CardPicker({ onPick, onClose }) {
                 <button
                   key={pageNumber}
                   onClick={() => setPage(pageNumber)}
-                  className={`px-2 py-1 border rounded ${
-                    pageNumber === page ? "bg-blue-600 text-white" : ""
+                  className={`px-2 py-1 border border-brand-periwinkle/40 rounded ${
+                    pageNumber === page
+                      ? "bg-brand-rose text-brand-ink border-brand-rose"
+                      : ""
                   }`}
                 >
                   {pageNumber}
@@ -137,7 +139,7 @@ export default function CardPicker({ onPick, onClose }) {
           <button
             disabled={page >= totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="px-3 py-1 border rounded disabled:opacity-40"
+            className="px-3 py-1 border border-brand-periwinkle/40 rounded disabled:opacity-40"
           >
             Next
           </button>
@@ -157,7 +159,7 @@ export default function CardPicker({ onPick, onClose }) {
           <p className="text-sm font-semibold">{selectedCard.name}</p>
           <button
             onClick={() => onPick(selectedCard)}
-            className="px-4 py-1 bg-blue-600 text-white rounded"
+            className="px-4 py-1 bg-brand-rose text-brand-ink font-semibold rounded"
           >
             Confirm
           </button>
