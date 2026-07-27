@@ -10,5 +10,9 @@ public class UserProfile
     public IdentityUser IdentityUser { get; set; }
 
     public List<BinderPage> BinderPages { get; set; }
-    
+
+    public string StarterPokemon { get; set; }
+    public int PetFeedCount { get; set; }
+    public double PetFullness { get; set; }
+    public DateTime PetLastFedAt { get; set; }
 };

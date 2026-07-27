@@ -26,13 +26,13 @@ export default function BinderPageList() {
         <h2 className="text-xl font-bold">Binder Pages</h2>
         <Link
           to="/binderpages/create"
-          className="px-4 py-2 rounded bg-green-600 hover:bg-green-500 text-white"
+          className="px-4 py-2 rounded bg-brand-rose hover:bg-brand-rose/90 text-brand-ink font-semibold"
         >
           + New Binder Page
         </Link>
       </div>
       {binderPages.length === 0 ? (
-        <p className="text-slate-500">
+        <p className="text-brand-ink/60">
           You don't have any binder pages yet — create one to get started.
         </p>
       ) : (
@@ -47,7 +47,10 @@ export default function BinderPageList() {
             {binderPages.map((bp) => (
               <tr key={bp.id}>
                 <td className="border-b py-2">
-                  <Link to={`/binderpages/${bp.id}`} className="text-blue-600 hover:underline">
+                  <Link
+                    to={`/binderpages/${bp.id}`}
+                    className="text-brand-ink underline decoration-brand-periwinkle/50 hover:text-brand-periwinkle"
+                  >
                     {bp.title}
                   </Link>
                 </td>

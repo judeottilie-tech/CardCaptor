@@ -2,7 +2,7 @@ export default function CardSlot({ slot, onSelect, onRemove }) {
   if (slot.card) {
     return (
       <div className="cursor-pointer" onClick={onSelect}>
-        <div className="relative aspect-[5/7] border rounded overflow-hidden hover:bg-slate-50">
+        <div className="relative aspect-[5/7] border border-brand-periwinkle/30 rounded overflow-hidden hover:bg-brand-blush/20">
           <img
             src={slot.card.imageUrl}
             alt={slot.card.name}
@@ -25,7 +25,7 @@ export default function CardSlot({ slot, onSelect, onRemove }) {
 
   return (
     <div
-      className="aspect-[5/7] border-2 border-dashed border-slate-300 rounded flex items-center justify-center cursor-pointer hover:bg-slate-50"
+      className="aspect-[5/7] border-2 border-dashed border-brand-periwinkle/40 rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle"
       onClick={onSelect}
     >
       +
