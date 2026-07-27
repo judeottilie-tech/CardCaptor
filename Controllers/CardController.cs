@@ -19,7 +19,7 @@ public class CardController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public IActionResult Get(string? search, string? category, string? rarity, string? era)
+    public IActionResult Get(string? search, string? category, string? rarity, string? era, int page = 1, int pageSize = 60)
     {
         var query = _dbContext.Cards.AsQueryable();
 
@@ -43,7 +43,15 @@ public class CardController : ControllerBase
             query = query.Where(c => c.Era == era);
         }
 
-        return Ok(query.ToList());
+        var totalCount = query.Count();
+
+        var cards = query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return Ok(new { totalCount, cards });
     }
+
 };
 
