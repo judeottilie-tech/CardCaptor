@@ -49,7 +49,7 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
     <nav className="bg-slate-800 text-white px-4 py-3">
       <div className="flex items-center justify-between">
         <NavLink to="/" className="text-lg font-bold hover:text-slate-300" onClick={closeMenu}>
-          Card Captor
+          CardCaptor
         </NavLink>
 
         <div className="hidden sm:flex items-center gap-2">{navLinks}</div>
