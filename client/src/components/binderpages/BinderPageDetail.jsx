@@ -148,8 +148,11 @@ export default function BinderPageDetail() {
         </form>
       </div>
 
-      <div className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto max-w-[clamp(220px,37vh,26rem)] sm:max-w-[clamp(320px,46vh,32rem)]">
-        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div
+        className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto"
+        style={{ maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
+      >
+        <div className="grid grid-cols-3 gap-1">
           {sortedSlots.map((slot) => (
             <CardSlot
               key={slot.id}

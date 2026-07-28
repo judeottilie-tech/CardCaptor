@@ -33,8 +33,8 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [selectedCard, setSelectedCard] = useState(currentCard || null);
-  const [searchInput, setSearchInput] = useState(currentCard?.name || "");
-  const [search, setSearch] = useState(currentCard?.name || "");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadedIds, setLoadedIds] = useState(new Set());
