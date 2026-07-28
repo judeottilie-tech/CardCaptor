@@ -136,7 +136,7 @@ export default function Pet() {
           className="pointer-events-none absolute -top-[6px] -left-[6px] h-[76px] w-[76px] -rotate-90"
           aria-hidden="true"
         >
-          <circle cx="38" cy="38" r={RING_R} fill="none" stroke="#F8EADC" strokeWidth="4" />
+          <circle cx="38" cy="38" r={RING_R} fill="none" stroke="#000336" strokeWidth="4" />
           <circle
             cx="38"
             cy="38"
