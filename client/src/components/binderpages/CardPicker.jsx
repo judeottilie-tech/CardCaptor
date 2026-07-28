@@ -36,6 +36,7 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [rarity, setRarity] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadedIds, setLoadedIds] = useState(new Set());
   const [isDesktop, setIsDesktop] = useState(
@@ -64,7 +65,7 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    getCards({ page, pageSize, search, category }, controller.signal)
+    getCards({ page, pageSize, search, category, rarity }, controller.signal)
       .then(({ cards, totalCount }) => {
         setCards(cards);
         setTotalCount(totalCount);
@@ -77,13 +78,18 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
         }
       });
     return () => controller.abort();
-  }, [page, pageSize, search, category]);
+  }, [page, pageSize, search, category, rarity]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
   const pageItems = getPageItems(page, totalPages);
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
+    setPage(1);
+  };
+
+  const handleRarityChange = (e) => {
+    setRarity(e.target.value);
     setPage(1);
   };
 
@@ -128,6 +134,31 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
             <option value="Pokemon">Pokemon</option>
             <option value="Trainer">Trainer</option>
             <option value="Energy">Energy</option>
+          </select>
+          <label htmlFor="card-rarity" className="sr-only">
+            Filter by rarity
+          </label>
+          <select
+            id="card-rarity"
+            value={rarity}
+            onChange={handleRarityChange}
+            className="border border-brand-periwinkle/40 rounded px-3 py-2 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
+          >
+            <option value="">All rarities</option>
+            <option value="Common">Common</option>
+            <option value="Uncommon">Uncommon</option>
+            <option value="Rare">Rare</option>
+            <option value="Amazing Rare">Amazing Rare</option>
+            <option value="Full Art Trainer">Full Art Trainer</option>
+            <option value="Black White Rare">Black White Rare</option>
+            <option value="Shiny rare V">Shiny rare V</option>
+            <option value="Shiny rare VMAX">Shiny rare VMAX</option>
+            <option value="Shiny Ultra Rare">Shiny Ultra Rare</option>
+            <option value="Illustration rare">Illustration Rare</option>
+            <option value="Special illustration rare">Special Illustration Rare</option>
+            <option value="Secret Rare">Secret Rare</option>
+            <option value="Hyper rare">Hyper Rare</option>
+            <option value="Mega Hyper Rare">Mega Hyper Rare</option>
           </select>
         </div>
 

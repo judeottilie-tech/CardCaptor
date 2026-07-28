@@ -7,16 +7,37 @@ function handleActivateKey(onSelect) {
   };
 }
 
-export default function CardSlot({ slot, onSelect, onRemove }) {
+export default function CardSlot({
+  slot,
+  onSelect,
+  onRemove,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDragLeave,
+  onDrop,
+  isDragging,
+  isDragOver,
+}) {
   if (slot.card) {
     return (
       <div
-        className="relative aspect-[5/7] cursor-pointer border border-brand-periwinkle/30 rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose"
+        className={`relative aspect-[5/7] cursor-grab active:cursor-grabbing border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-opacity ${
+          isDragOver
+            ? "border-2 border-brand-rose bg-brand-blush/30"
+            : "border-brand-periwinkle/30"
+        } ${isDragging ? "opacity-40" : ""}`}
         role="button"
         tabIndex={0}
+        draggable
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
         onClick={onSelect}
         onKeyDown={handleActivateKey(onSelect)}
-        aria-label={`${slot.card.name}, slot ${slot.position}. Press Enter to change card.`}
+        aria-label={`${slot.card.name}, slot ${slot.position}. Press Enter to change card, or drag to move it to another slot.`}
       >
         <img
           src={slot.card.imageUrl}
@@ -49,12 +70,17 @@ export default function CardSlot({ slot, onSelect, onRemove }) {
 
   return (
     <div
-      className="aspect-[5/7] border-2 border-dashed border-brand-periwinkle/40 rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle focus-visible:ring-2 focus-visible:ring-brand-rose"
+      className={`aspect-[5/7] border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle focus-visible:ring-2 focus-visible:ring-brand-rose ${
+        isDragOver ? "border-brand-rose bg-brand-blush/30" : "border-brand-periwinkle/40"
+      }`}
       role="button"
       tabIndex={0}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
       onClick={onSelect}
       onKeyDown={handleActivateKey(onSelect)}
-      aria-label={`Empty slot ${slot.position}. Press Enter to add a card.`}
+      aria-label={`Empty slot ${slot.position}. Press Enter to add a card, or drop a card here to move it.`}
     >
       <span aria-hidden="true">+</span>
     </div>

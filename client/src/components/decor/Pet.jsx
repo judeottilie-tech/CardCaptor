@@ -1,28 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
-import { getPet, feedPet } from "../../managers/petManager";
+import { feedPet } from "../../managers/petManager";
 import { getSpriteUrl } from "../../data/pokemonStarters";
 import Heart from "./heart";
 
 const FED_LINES = ["yummers!!!", "thankya!!", "yummy", "my favorite", ":3", "heheee"];
 
-export default function Pet() {
-  const [pet, setPet] = useState(null);
+export default function Pet({ pet, setPet }) {
   const [line, setLine] = useState(null);
   const [evolvedTo, setEvolvedTo] = useState(null);
   const [hearts, setHearts] = useState([]);
   const controls = useAnimationControls();
   const heartId = useRef(0);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    getPet(controller.signal)
-      .then(setPet)
-      .catch((err) => {
-        if (err.name !== "AbortError") throw err;
-      });
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     let timeout;
