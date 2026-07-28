@@ -1,11 +1,42 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { logout } from "../managers/authManager";
+import { getPet } from "../managers/petManager";
+import { getPortraitUrl } from "../data/pokemonStarters";
 
 export default function NavBar({ loggedInUser, setLoggedInUser }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pet, setPet] = useState(null);
+  const menuRef = useRef(null);
 
   const closeMenu = () => setMenuOpen(false);
+
+  useEffect(() => {
+    if (!loggedInUser) return;
+    const controller = new AbortController();
+    getPet(controller.signal)
+      .then(setPet)
+      .catch((err) => {
+        if (err.name !== "AbortError") throw err;
+      });
+    return () => controller.abort();
+  }, [loggedInUser]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) closeMenu();
+    };
+    const handleEscape = (e) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [menuOpen]);
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -15,35 +46,8 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
     closeMenu();
   };
 
-  const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded hover:bg-brand-cream/10 ${isActive ? "bg-brand-cream/15" : ""}`;
-
-  const navLinks = loggedInUser ? (
-    <>
-      <NavLink to="/" className={linkClass} onClick={closeMenu}>
-        My Binder Pages
-      </NavLink>
-      <NavLink to="/binderpages/create" className={linkClass} onClick={closeMenu}>
-        New Binder Page
-      </NavLink>
-      <span className="px-3 text-brand-cream/70">{loggedInUser.displayName}</span>
-      <button
-        onClick={handleLogout}
-        className="px-3 py-2 rounded border border-brand-rose text-brand-rose hover:bg-brand-rose/10 font-semibold text-left"
-      >
-        Logout
-      </button>
-    </>
-  ) : (
-    <>
-      <NavLink to="/login" className={linkClass} onClick={closeMenu}>
-        Login
-      </NavLink>
-      <NavLink to="/register" className={linkClass} onClick={closeMenu}>
-        Register
-      </NavLink>
-    </>
-  );
+  const menuLinkClass = ({ isActive }) =>
+    `block px-4 py-2 rounded hover:bg-brand-cream/10 ${isActive ? "bg-brand-cream/15" : ""}`;
 
   return (
     <nav className="bg-brand-ink text-brand-cream px-4 py-3 relative">
@@ -56,28 +60,81 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
         aria-hidden="true"
       />
       <div className="flex items-center justify-between">
-        <NavLink
-          to="/"
-          className="font-heading text-lg font-bold hover:text-brand-blush"
-          onClick={closeMenu}
-        >
+        <NavLink to="/" className="font-heading text-lg font-bold hover:text-brand-blush">
           CardCaptor
         </NavLink>
 
-        <div className="hidden sm:flex items-center gap-2">{navLinks}</div>
+        {loggedInUser ? (
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen((open) => !open)}
+              aria-label="Account menu"
+              aria-expanded={menuOpen}
+              className="h-9 w-9 rounded-full overflow-hidden bg-brand-cream/10 hover:ring-2 hover:ring-brand-rose transition-all flex items-center justify-center"
+            >
+              {pet && (
+                <img
+                  src={getPortraitUrl(pet.currentPokemon)}
+                  alt={pet.currentPokemon}
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </button>
 
-        <button
-          className="sm:hidden px-2 py-1 rounded hover:bg-brand-cream/10 text-xl leading-none"
-          onClick={() => setMenuOpen((open) => !open)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? "✕" : "☰"}
-        </button>
+            {menuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-64 bg-brand-ink border border-brand-cream/10 rounded-xl shadow-xl overflow-hidden z-50">
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-brand-cream/10">
+                  {pet && (
+                    <img
+                      src={getPortraitUrl(pet.currentPokemon)}
+                      alt={pet.currentPokemon}
+                      className="h-10 w-10 rounded-full object-cover shrink-0"
+                    />
+                  )}
+                  <p className="font-semibold truncate">{loggedInUser.displayName}</p>
+                </div>
+
+                <div className="py-1">
+                  <NavLink to="/" className={menuLinkClass} onClick={closeMenu}>
+                    My Binder Pages
+                  </NavLink>
+                  <NavLink
+                    to="/binderpages/create"
+                    className={menuLinkClass}
+                    onClick={closeMenu}
+                  >
+                    New Binder Page
+                  </NavLink>
+                </div>
+
+                <div className="border-t border-brand-cream/10 py-1">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 rounded hover:bg-brand-rose/10 text-brand-rose font-semibold"
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <NavLink
+              to="/login"
+              className="px-3 py-2 rounded hover:bg-brand-cream/10"
+            >
+              Login
+            </NavLink>
+            <NavLink
+              to="/register"
+              className="px-3 py-2 rounded hover:bg-brand-cream/10"
+            >
+              Register
+            </NavLink>
+          </div>
+        )}
       </div>
-
-      {menuOpen && (
-        <div className="sm:hidden flex flex-col gap-1 mt-2">{navLinks}</div>
-      )}
     </nav>
   );
 }

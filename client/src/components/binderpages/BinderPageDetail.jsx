@@ -20,6 +20,7 @@ export default function BinderPageDetail() {
   const [newDescription, setNewDescription] = useState("");
   const [justSaved, setJustSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const loadBinderPage = (signal) => {
     return getBinderPageById(id, signal).then((bp) => {
@@ -66,6 +67,18 @@ export default function BinderPageDetail() {
     deleteBinderPage(binderPage.id).then(() => navigate("/"));
   };
 
+  const handleStartEdit = () => {
+    setNewTitle(binderPage.title);
+    setNewDescription(binderPage.description || "");
+    setEditing(true);
+  };
+
+  const handleExitEdit = () => {
+    setNewTitle(binderPage.title);
+    setNewDescription(binderPage.description || "");
+    setEditing(false);
+  };
+
   const handleUpdateBinder = (e) => {
     e.preventDefault();
     setSaving(true);
@@ -83,6 +96,7 @@ export default function BinderPageDetail() {
     ]).then(
       () => {
         setSaving(false);
+        setEditing(false);
         loadBinderPage();
         setJustSaved(true);
         setTimeout(() => setJustSaved(false), 1500);
@@ -112,40 +126,66 @@ export default function BinderPageDetail() {
   return (
     <div className="mx-auto mt-4 sm:mt-8 px-4 max-w-2xl">
       <div className="bg-white/5 rounded-2xl p-4 sm:p-6 mb-4">
-        <form onSubmit={handleUpdateBinder} className="flex flex-col gap-2">
-          <div className="flex flex-col sm:flex-row gap-2">
+        {editing ? (
+          <form onSubmit={handleUpdateBinder} className="flex flex-col gap-2">
             <input
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="font-heading text-xl font-bold border border-brand-periwinkle/40 rounded px-2 py-1 flex-1 min-w-0 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
+              className="font-heading text-xl font-bold border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
+              autoFocus
             />
-            <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="Add a description or notes..."
+              className="text-sm border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
+            />
+            <div className="flex justify-end items-center gap-2 mt-2">
+              {justSaved && <span className="text-green-400 text-sm mr-auto">Saved</span>}
+              <button
+                type="button"
+                onClick={handleExitEdit}
+                className="px-3 py-1 rounded border border-brand-periwinkle/40 hover:bg-brand-blush/10"
+              >
+                Exit
+              </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="flex-1 sm:flex-none px-3 py-1 rounded bg-brand-rose text-brand-ink font-semibold disabled:opacity-50"
+                className="px-3 py-1 rounded bg-brand-rose text-brand-ink font-semibold disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="flex justify-between items-start gap-4">
+            <div className="min-w-0">
+              <h1 className="font-heading text-xl font-bold truncate">{binderPage.title}</h1>
+              {binderPage.description && (
+                <p className="text-sm text-brand-cream/60 mt-1">{binderPage.description}</p>
+              )}
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleStartEdit}
+                className="px-3 py-1 rounded bg-brand-rose text-brand-ink font-semibold"
+              >
+                Edit
               </button>
               <button
                 type="button"
                 onClick={handleDeleteBinder}
-                className="flex-1 sm:flex-none px-3 py-1 rounded border border-red-400 text-red-400 hover:bg-red-400/10"
+                className="px-3 py-1 rounded border border-red-400 text-red-400 hover:bg-red-400/10"
               >
                 Delete
               </button>
-              {justSaved && <span className="text-green-400 text-sm">Saved</span>}
             </div>
           </div>
-          <input
-            type="text"
-            value={newDescription}
-            onChange={(e) => setNewDescription(e.target.value)}
-            placeholder="Add a description or notes..."
-            className="text-sm border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
-          />
-        </form>
+        )}
       </div>
 
       <div
