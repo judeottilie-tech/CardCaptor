@@ -79,7 +79,13 @@ export default function Login({ setLoggedInUser }) {
           </button>
         </form>
         <p className="mt-4">
-          Not signed up? Register <Link to="/register">here</Link>
+          Not signed up?{" "}
+          <Link
+            to="/register"
+            className="text-brand-sky underline decoration-2 underline-offset-2 hover:text-brand-lavender font-semibold"
+          >
+            Register here
+          </Link>
         </p>
       </div>
     </div>

@@ -6,21 +6,6 @@ import Heart from "./heart";
 
 const FED_LINES = ["yummers!!!", "thankya!!", "yummy", "my favorite", ":3", "heheee"];
 
-const MOOD = {
-  happy: { threshold: 60, ring: "#9EDEF9" },
-  neutral: { threshold: 30, ring: "#FAD0D5" },
-  hungry: { threshold: 0, ring: "#F59BAD" },
-};
-
-function getMood(fullness) {
-  if (fullness >= MOOD.happy.threshold) return MOOD.happy;
-  if (fullness >= MOOD.neutral.threshold) return MOOD.neutral;
-  return MOOD.hungry;
-}
-
-const RING_R = 34;
-const RING_CIRC = 2 * Math.PI * RING_R;
-
 export default function Pet() {
   const [pet, setPet] = useState(null);
   const [line, setLine] = useState(null);
@@ -41,23 +26,22 @@ export default function Pet() {
 
   useEffect(() => {
     let timeout;
-    const scheduleSquish = () => {
+    const scheduleHop = () => {
       timeout = setTimeout(() => {
         controls.start({
-          scaleY: [1, 0.8, 1.08, 1],
-          scaleX: [1, 1.1, 0.95, 1],
-          transition: { duration: 0.5 },
+          y: [0, -20, 0, -8, 0],
+          scaleY: [1, 1.08, 0.85, 1.05, 1],
+          scaleX: [1, 0.94, 1.1, 0.97, 1],
+          transition: { duration: 0.7, ease: "easeOut" },
         });
-        scheduleSquish();
-      }, 4000 + Math.random() * 5000);
+        scheduleHop();
+      }, 2500 + Math.random() * 3500);
     };
-    scheduleSquish();
+    scheduleHop();
     return () => clearTimeout(timeout);
   }, [controls]);
 
   if (!pet) return null;
-
-  const mood = getMood(pet.fullness);
 
   const handleFeed = () => {
     feedPet().then((updated) => {
@@ -72,6 +56,7 @@ export default function Pet() {
       }
 
       controls.start({
+        y: [0, -28, 0],
         scaleY: [1, 0.7, 1.15, 1],
         scaleX: [1, 1.2, 0.9, 1],
         transition: { duration: 0.55 },
@@ -131,37 +116,17 @@ export default function Pet() {
           ))}
         </AnimatePresence>
 
-        <svg
-          viewBox="0 0 76 76"
-          className="pointer-events-none absolute -top-[6px] -left-[6px] h-[76px] w-[76px] -rotate-90"
-          aria-hidden="true"
-        >
-          <circle cx="38" cy="38" r={RING_R} fill="none" stroke="#000336" strokeWidth="4" />
-          <circle
-            cx="38"
-            cy="38"
-            r={RING_R}
-            fill="none"
-            stroke={mood.ring}
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={RING_CIRC}
-            strokeDashoffset={RING_CIRC * (1 - pet.fullness / 100)}
-            style={{ transition: "stroke-dashoffset 0.4s ease, stroke 0.4s ease" }}
-          />
-        </svg>
-
         <button
           type="button"
           onClick={handleFeed}
           aria-label="Feed your pet"
           title={`${pet.currentPokemon} (feed to help it evolve)`}
-          className="h-16 w-16 overflow-hidden rounded-full bg-white p-2 shadow-lg"
+          className="block"
         >
           <img
             src={getSpriteUrl(pet.currentPokemon)}
             alt={pet.currentPokemon}
-            className="h-full w-full object-contain"
+            className="h-32 w-32 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
           />
         </button>
       </motion.div>
