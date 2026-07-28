@@ -1,0 +1,32 @@
+export const STARTER_LINES = [
+  { stage1: "Bulbasaur", stage2: "Ivysaur", stage3: "Venusaur" },
+  { stage1: "Charmander", stage2: "Charmeleon", stage3: "Charizard" },
+  { stage1: "Squirtle", stage2: "Wartortle", stage3: "Blastoise" },
+  { stage1: "Chikorita", stage2: "Bayleef", stage3: "Meganium" },
+  { stage1: "Cyndaquil", stage2: "Quilava", stage3: "Typhlosion" },
+  { stage1: "Totodile", stage2: "Croconaw", stage3: "Feraligatr" },
+  { stage1: "Treecko", stage2: "Grovyle", stage3: "Sceptile" },
+  { stage1: "Torchic", stage2: "Combusken", stage3: "Blaziken" },
+  { stage1: "Mudkip", stage2: "Marshtomp", stage3: "Swampert" },
+  { stage1: "Turtwig", stage2: "Grotle", stage3: "Torterra" },
+  { stage1: "Chimchar", stage2: "Monferno", stage3: "Infernape" },
+  { stage1: "Piplup", stage2: "Prinplup", stage3: "Empoleon" },
+  { stage1: "Snivy", stage2: "Servine", stage3: "Serperior" },
+  { stage1: "Tepig", stage2: "Pignite", stage3: "Emboar" },
+  { stage1: "Oshawott", stage2: "Dewott", stage3: "Samurott" },
+  { stage1: "Chespin", stage2: "Quilladin", stage3: "Chesnaught" },
+  { stage1: "Fennekin", stage2: "Braixen", stage3: "Delphox" },
+  { stage1: "Froakie", stage2: "Frogadier", stage3: "Greninja" },
+  { stage1: "Rowlet", stage2: "Dartrix", stage3: "Decidueye" },
+  { stage1: "Litten", stage2: "Torracat", stage3: "Incineroar" },
+  { stage1: "Popplio", stage2: "Brionne", stage3: "Primarina" },
+  { stage1: "Grookey", stage2: "Thwackey", stage3: "Rillaboom" },
+  { stage1: "Scorbunny", stage2: "Raboot", stage3: "Cinderace" },
+  { stage1: "Sobble", stage2: "Drizzile", stage3: "Inteleon" },
+  { stage1: "Sprigatito", stage2: "Floragato", stage3: "Meowscarada" },
+  { stage1: "Fuecoco", stage2: "Crocalor", stage3: "Skeledirge" },
+  { stage1: "Quaxly", stage2: "Quaxwell", stage3: "Quaquaval" },
+];
+
+export const getSpriteUrl = (pokemonName) =>
+  `https://play.pokemonshowdown.com/sprites/ani/${pokemonName.toLowerCase()}.gif`;

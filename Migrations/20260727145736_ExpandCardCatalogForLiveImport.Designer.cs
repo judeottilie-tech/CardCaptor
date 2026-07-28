@@ -3,6 +3,7 @@ using System;
 using CardCaptor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CardCaptor.Migrations
 {
     [DbContext(typeof(CardCaptorDbContext))]
-    partial class CardCaptorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727145736_ExpandCardCatalogForLiveImport")]
+    partial class ExpandCardCatalogForLiveImport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +35,6 @@ namespace CardCaptor.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -140,19 +140,6 @@ namespace CardCaptor.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PetFeedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("PetFullness")
-                        .HasColumnType("double precision");
-
-                    b.Property<DateTime>("PetLastFedAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("StarterPokemon")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityUserId");
@@ -164,11 +151,7 @@ namespace CardCaptor.Migrations
                         {
                             Id = 1,
                             DisplayName = "Administrator",
-                            IdentityUserId = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
-                            PetFeedCount = 0,
-                            PetFullness = 100.0,
-                            PetLastFedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            StarterPokemon = "Bulbasaur"
+                            IdentityUserId = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f"
                         });
                 });
 
@@ -291,13 +274,13 @@ namespace CardCaptor.Migrations
                         {
                             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "02a7b74f-8791-44ca-a5de-9df186536535",
+                            ConcurrencyStamp = "6309313d-a911-423a-966c-79e9c1cb3b95",
                             Email = "admin@cardcaptor.comx",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAED0YJuo3oc5NA8508V9DErvgMXDo9tWsE/tk5CM/YSRKFtvtFxLcV9rK/LrgD2lrGg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHFGEX6/FV7+H6QePvrAHMDDjl/x+vfxU8gA8PRyCJojcl2t0Fz2HpKifRzJPrCmKg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "da5dbabd-64d1-459d-afd7-ffaf17478737",
+                            SecurityStamp = "cb7eb756-cd1d-4bf2-bb4a-d3d0f70a7e8e",
                             TwoFactorEnabled = false,
                             UserName = "Administrator"
                         });

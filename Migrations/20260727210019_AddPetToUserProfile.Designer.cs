@@ -3,6 +3,7 @@ using System;
 using CardCaptor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CardCaptor.Migrations
 {
     [DbContext(typeof(CardCaptorDbContext))]
-    partial class CardCaptorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727210019_AddPetToUserProfile")]
+    partial class AddPetToUserProfile
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +35,6 @@ namespace CardCaptor.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -291,13 +291,13 @@ namespace CardCaptor.Migrations
                         {
                             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "02a7b74f-8791-44ca-a5de-9df186536535",
+                            ConcurrencyStamp = "02b2d210-eb0c-438c-ada4-2297a6687a1d",
                             Email = "admin@cardcaptor.comx",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAED0YJuo3oc5NA8508V9DErvgMXDo9tWsE/tk5CM/YSRKFtvtFxLcV9rK/LrgD2lrGg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFZd9rR+LiFNkjQeXz8G7Fe2uuUp1S11h4CwyONd7rXcsdYlAb5VAULnfbju0hXVQw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "da5dbabd-64d1-459d-afd7-ffaf17478737",
+                            SecurityStamp = "17d2c9e6-3fc8-45a6-b1b7-61073fcb8de9",
                             TwoFactorEnabled = false,
                             UserName = "Administrator"
                         });
