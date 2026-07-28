@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import NavBar from './components/NavBar'
 import ApplicationViews from './components/ApplicationViews'
 import { tryGetLoggedInUser } from './managers/authManager'
+import CursorTrail from './components/decor/cursorTrail'
+import Pet from './components/decor/Pet'
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState();
@@ -22,6 +24,8 @@ function App() {
 
   return (
     <>
+      <CursorTrail />
+      {loggedInUser && <Pet />}
       <NavBar loggedInUser={loggedInUser} setLoggedInUser={setLoggedInUser} />
       <ApplicationViews
         loggedInUser={loggedInUser}

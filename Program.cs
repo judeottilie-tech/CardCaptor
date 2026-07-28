@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 
 using CardCaptor.Data;
+using CardCaptor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +52,20 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 builder.Services.AddNpgsql<CardCaptorDbContext>(builder.Configuration["CardCaptorDbConnectionString"]);
 
+builder.Services.AddHttpClient<CardImportService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.tcgdex.net/v2/en/");
+});
+
 var app = builder.Build();
+
+if (args.Contains("--import-cards"))
+{
+    using var importScope = app.Services.CreateScope();
+    var importer = importScope.ServiceProvider.GetRequiredService<CardImportService>();
+    await importer.RunAsync();
+    return;
+}
 
 if (app.Environment.IsDevelopment())
 {

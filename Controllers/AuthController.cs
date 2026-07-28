@@ -113,6 +113,11 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegistrationDTO registration)
     {
+        if (!PokemonStarters.IsValidStarter(registration.StarterPokemon))
+        {
+            return BadRequest("Invalid starter Pokemon.");
+        }
+
         var user = new IdentityUser
         {
             UserName = registration.UserName
@@ -128,7 +133,11 @@ public class AuthController : ControllerBase
             _dbContext.UserProfiles.Add(new UserProfile
             {
                 DisplayName = registration.DisplayName,
-                IdentityUserId = user.Id
+                IdentityUserId = user.Id,
+                StarterPokemon = registration.StarterPokemon,
+                PetFeedCount = 0,
+                PetFullness = 100,
+                PetLastFedAt = DateTime.UtcNow
             });
             _dbContext.SaveChanges();
 
