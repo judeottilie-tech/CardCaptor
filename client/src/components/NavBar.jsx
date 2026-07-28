@@ -29,7 +29,7 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
       <span className="px-3 text-brand-cream/70">{loggedInUser.displayName}</span>
       <button
         onClick={handleLogout}
-        className="px-3 py-2 rounded bg-brand-rose hover:bg-brand-rose/90 text-brand-ink font-semibold text-left"
+        className="px-3 py-2 rounded border border-brand-rose text-brand-rose hover:bg-brand-rose/10 font-semibold text-left"
       >
         Logout
       </button>
@@ -46,7 +46,15 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
   );
 
   return (
-    <nav className="bg-brand-ink text-brand-cream px-4 py-3">
+    <nav className="bg-brand-ink text-brand-cream px-4 py-3 relative">
+      <div
+        className="absolute left-0 right-0 bottom-0 h-[3px]"
+        style={{
+          background:
+            "linear-gradient(to right, #FAB323, #FEFA04, #76F4BD, #2AD3DC, #C2BBFA, #7971FC, #F913DE, #FD8CEA)",
+        }}
+        aria-hidden="true"
+      />
       <div className="flex items-center justify-between">
         <NavLink
           to="/"

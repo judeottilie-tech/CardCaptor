@@ -76,8 +76,9 @@ public class BinderPageController : ControllerBase
         var binderPage = new BinderPage
         {
           Title = dto.Title,
+          Description = dto.Description,
           UserProfileId = profile.Id,
-          CreatedAt = DateTime.UtcNow  
+          CreatedAt = DateTime.UtcNow
         };
         _dbContext.BinderPages.Add(binderPage);
         _dbContext.SaveChanges();
@@ -110,6 +111,7 @@ public class BinderPageController : ControllerBase
         if (binderPage.UserProfileId != profile.Id) return NotFound();
 
         binderPage.Title = dto.Title;
+        binderPage.Description = dto.Description;
         _dbContext.SaveChanges();
 
         return NoContent();
