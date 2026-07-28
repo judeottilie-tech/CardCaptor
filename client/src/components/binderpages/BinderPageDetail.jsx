@@ -21,6 +21,10 @@ export default function BinderPageDetail() {
   const [justSaved, setJustSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [slotsSaving, setSlotsSaving] = useState(false);
+  const [slotsJustSaved, setSlotsJustSaved] = useState(false);
+  const [draggedSlotId, setDraggedSlotId] = useState(null);
+  const [dragOverSlotId, setDragOverSlotId] = useState(null);
 
   const loadBinderPage = (signal) => {
     return getBinderPageById(id, signal).then((bp) => {
@@ -44,11 +48,14 @@ export default function BinderPageDetail() {
   const handleSelectSlot = (slotId) => {
     setSelectedSlotId(slotId);
   };
-  
+
   const handleClosePicker = () => {
     setSelectedSlotId(null);
-  };  
+  };
 
+  // Card slot changes are staged locally in pendingSlots and only persisted
+  // when the (always-visible, independent of the title/description edit
+  // mode) Save button below the grid is clicked.
   const handlePickCard = (card) => {
     setPendingSlots((slots) =>
       slots.map((s) => (s.id === selectedSlotId ? { ...s, cardId: card.id, card } : s)),
@@ -60,6 +67,66 @@ export default function BinderPageDetail() {
     setPendingSlots((slots) =>
       slots.map((s) => (s.id === slotId ? { ...s, cardId: null, card: null } : s)),
     );
+  };
+
+  // Drag-and-drop swaps (or moves, if the target is empty) two slots'
+  // cards — staged in pendingSlots just like a CardPicker pick, so it
+  // still requires the Save button below to persist.
+  const handleSlotDragStart = (slotId) => (e) => {
+    setDraggedSlotId(slotId);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(slotId));
+  };
+
+  const handleSlotDragEnd = () => {
+    setDraggedSlotId(null);
+    setDragOverSlotId(null);
+  };
+
+  const handleSlotDragOver = (slotId) => (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (dragOverSlotId !== slotId) setDragOverSlotId(slotId);
+  };
+
+  const handleSlotDragLeave = (slotId) => () => {
+    setDragOverSlotId((current) => (current === slotId ? null : current));
+  };
+
+  const handleSlotDrop = (targetSlotId) => (e) => {
+    e.preventDefault();
+    const sourceSlotId = Number(e.dataTransfer.getData("text/plain"));
+    setDraggedSlotId(null);
+    setDragOverSlotId(null);
+    if (!sourceSlotId || sourceSlotId === targetSlotId) return;
+
+    setPendingSlots((slots) => {
+      const source = slots.find((s) => s.id === sourceSlotId);
+      const target = slots.find((s) => s.id === targetSlotId);
+      if (!source || !target) return slots;
+      return slots.map((s) => {
+        if (s.id === sourceSlotId) return { ...s, cardId: target.cardId, card: target.card };
+        if (s.id === targetSlotId) return { ...s, cardId: source.cardId, card: source.card };
+        return s;
+      });
+    });
+  };
+
+  const handleSaveSlots = () => {
+    setSlotsSaving(true);
+    const slotUpdates = pendingSlots
+      .filter((slot) => {
+        const original = binderPage.binderPageCardSlots.find((s) => s.id === slot.id);
+        return original.cardId !== slot.cardId;
+      })
+      .map((slot) => (slot.cardId ? attachCard(slot.id, slot.cardId) : removeCard(slot.id)));
+
+    Promise.all(slotUpdates).then(() => {
+      setSlotsSaving(false);
+      loadBinderPage();
+      setSlotsJustSaved(true);
+      setTimeout(() => setSlotsJustSaved(false), 1500);
+    });
   };
 
   const handleDeleteBinder = () => {
@@ -83,25 +150,13 @@ export default function BinderPageDetail() {
     e.preventDefault();
     setSaving(true);
 
-    const slotUpdates = pendingSlots
-      .filter((slot) => {
-        const original = binderPage.binderPageCardSlots.find((s) => s.id === slot.id);
-        return original.cardId !== slot.cardId;
-      })
-      .map((slot) => (slot.cardId ? attachCard(slot.id, slot.cardId) : removeCard(slot.id)));
-
-    Promise.all([
-      updateBinderPage(binderPage.id, { title: newTitle, description: newDescription }),
-      ...slotUpdates,
-    ]).then(
-      () => {
-        setSaving(false);
-        setEditing(false);
-        loadBinderPage();
-        setJustSaved(true);
-        setTimeout(() => setJustSaved(false), 1500);
-      },
-    );
+    updateBinderPage(binderPage.id, { title: newTitle, description: newDescription }).then(() => {
+      setSaving(false);
+      setEditing(false);
+      loadBinderPage();
+      setJustSaved(true);
+      setTimeout(() => setJustSaved(false), 1500);
+    });
   };
 
 
@@ -122,6 +177,10 @@ export default function BinderPageDetail() {
   }
 
   const sortedSlots = [...pendingSlots].sort((a, b) => a.position - b.position);
+  const slotsDirty = pendingSlots.some((slot) => {
+    const original = binderPage.binderPageCardSlots.find((s) => s.id === slot.id);
+    return original.cardId !== slot.cardId;
+  });
 
   return (
     <div className="mx-auto mt-4 sm:mt-8 px-4 max-w-2xl">
@@ -192,6 +251,21 @@ export default function BinderPageDetail() {
         className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto"
         style={{ maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
       >
+        <div className="flex justify-end items-center gap-2 mb-3">
+          {slotsJustSaved && <span className="text-green-400 text-sm mr-auto">Saved</span>}
+          <button
+            type="button"
+            onClick={handleSaveSlots}
+            disabled={!slotsDirty || slotsSaving}
+            className={`px-3 py-1 rounded font-semibold text-sm transition-colors ${
+              slotsDirty
+                ? "bg-brand-rose text-brand-ink"
+                : "bg-black/10 text-brand-cream/30 cursor-not-allowed"
+            }`}
+          >
+            {slotsSaving ? "Saving..." : "Save"}
+          </button>
+        </div>
         <div className="grid grid-cols-3 gap-1">
           {sortedSlots.map((slot) => (
             <CardSlot
@@ -199,6 +273,13 @@ export default function BinderPageDetail() {
               slot={slot}
               onSelect={() => handleSelectSlot(slot.id)}
               onRemove={() => handleRemoveCard(slot.id)}
+              onDragStart={slot.card ? handleSlotDragStart(slot.id) : undefined}
+              onDragEnd={handleSlotDragEnd}
+              onDragOver={handleSlotDragOver(slot.id)}
+              onDragLeave={handleSlotDragLeave(slot.id)}
+              onDrop={handleSlotDrop(slot.id)}
+              isDragging={draggedSlotId === slot.id}
+              isDragOver={dragOverSlotId === slot.id && draggedSlotId !== slot.id}
             />
           ))}
         </div>

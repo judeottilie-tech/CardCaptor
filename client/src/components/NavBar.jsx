@@ -1,26 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { logout } from "../managers/authManager";
-import { getPet } from "../managers/petManager";
 import { getPortraitUrl } from "../data/pokemonStarters";
 
-export default function NavBar({ loggedInUser, setLoggedInUser }) {
+export default function NavBar({ loggedInUser, setLoggedInUser, pet }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [pet, setPet] = useState(null);
   const menuRef = useRef(null);
 
   const closeMenu = () => setMenuOpen(false);
-
-  useEffect(() => {
-    if (!loggedInUser) return;
-    const controller = new AbortController();
-    getPet(controller.signal)
-      .then(setPet)
-      .catch((err) => {
-        if (err.name !== "AbortError") throw err;
-      });
-    return () => controller.abort();
-  }, [loggedInUser]);
 
   useEffect(() => {
     if (!menuOpen) return;
