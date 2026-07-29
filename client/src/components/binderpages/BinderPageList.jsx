@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getBinderPages, deleteBinderPage } from "../../managers/binderPageManager";
-import Heart from "../decor/heart";
 
 export default function BinderPageList() {
   const [binderPages, setBinderPages] = useState([]);
@@ -35,7 +34,6 @@ export default function BinderPageList() {
       {binderPages.length === 0 ? (
         <p className="inline-flex items-center gap-1.5 text-brand-cream/60">
           You don't have any binder pages yet — create one to get started.
-          <Heart className="h-4 w-4 shrink-0" color="#F59BAD" />
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
