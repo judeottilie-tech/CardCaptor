@@ -4,7 +4,7 @@ import { feedPet } from "../../managers/petManager";
 import { getSpriteUrl } from "../../data/pokemonStarters";
 import Heart from "./heart";
 
-const FED_LINES = ["yummers!!!", "thankya!!", "yummy", "my favorite", ":3", "heheee"];
+const FED_LINES = ["!!!", ":0", "!", "!!!", ":D", ":3", ">:|"];
 
 export default function Pet({ pet, setPet }) {
   const [line, setLine] = useState(null);
@@ -100,7 +100,7 @@ export default function Pet({ pet, setPet }) {
               transition={{ duration: 0.65, delay: h.delay, ease: "easeOut" }}
               className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2"
             >
-              <Heart color="#F59BAD" className="h-3 w-3" />
+              <Heart color="#d137bf" className="h-3 w-3" />
             </motion.span>
           ))}
         </AnimatePresence>
