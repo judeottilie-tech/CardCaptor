@@ -49,6 +49,8 @@ public class AuthController : ControllerBase
 
             if (result == PasswordVerificationResult.Success)
             {
+                ResetDemoAccountIfNeeded(user);
+
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -70,6 +72,47 @@ public class AuthController : ControllerBase
         {
             return StatusCode(500);
         }
+    }
+
+    // The demo account is shared by every visitor who clicks "Try Demo," so
+    // whatever the previous visitor left behind (renamed/deleted binder,
+    // filled slots, fed pet) gets wiped back to the pristine seeded state
+    // the moment anyone logs in as DemoUser, rather than requiring a
+    // scheduled background job.
+    private void ResetDemoAccountIfNeeded(IdentityUser user)
+    {
+        if (user.UserName != "DemoUser") return;
+
+        var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == user.Id);
+        if (profile == null) return;
+
+        var existingPages = _dbContext.BinderPages.Where(bp => bp.UserProfileId == profile.Id);
+        _dbContext.BinderPages.RemoveRange(existingPages);
+
+        profile.StarterPokemon = "Bulbasaur";
+        profile.PetFeedCount = 0;
+        profile.PetFullness = 100;
+        profile.PetLastFedAt = DateTime.UtcNow;
+        _dbContext.SaveChanges();
+
+        var demoBinder = new BinderPage
+        {
+            Title = "Demo Binder",
+            CreatedAt = DateTime.UtcNow,
+            UserProfileId = profile.Id
+        };
+        _dbContext.BinderPages.Add(demoBinder);
+        _dbContext.SaveChanges();
+
+        for (int position = 1; position <= 9; position++)
+        {
+            _dbContext.BinderPageCardSlots.Add(new BinderPageCardSlot
+            {
+                Position = position,
+                BinderPageId = demoBinder.Id
+            });
+        }
+        _dbContext.SaveChanges();
     }
 
     [HttpGet]
