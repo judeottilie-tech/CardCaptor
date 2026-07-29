@@ -17,7 +17,7 @@ export default {
         brand: {
           ink: "#000336",
           cream: "#FDF8E6",
-          rose: "#F913DE",
+          rose: "#d137bf",
           blush: "#FD8CEA",
           periwinkle: "#7971FC",
           sky: "#2AD3DC",

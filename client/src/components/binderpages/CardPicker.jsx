@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { getCards } from "../../managers/cardManager";
 
-// Keep at/below the ~20-request burst that assets.tcgdex.net can reliably
-// serve at once — going higher (tried 24) caused widespread image failures.
-// Sized per breakpoint so the grid is a clean, complete rectangle that fits
-// the modal without scrolling: 3 cols x 3 rows on mobile, 4 cols x 3 rows
-// on sm+ (matches Tailwind's `sm` breakpoint, used for grid-cols below).
 const MOBILE_PAGE_SIZE = 9;
 const DESKTOP_PAGE_SIZE = 12;
 const DESKTOP_BREAKPOINT = "(min-width: 640px)";
@@ -163,9 +158,6 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
         </div>
 
         <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-          {/* Preview frame — desktop/tablet only. On mobile there's no room
-              for it, so selecting a card just rings its thumbnail and lights
-              up Confirm in the bar below. */}
           <div className="hidden sm:flex sm:order-2 w-full sm:w-64 shrink-0 flex-col items-center gap-2 border-2 border-dashed border-brand-periwinkle/40 rounded-lg p-3">
             <div className="w-full aspect-[5/7] rounded overflow-hidden bg-brand-blush/10 flex items-center justify-center">
               {selectedCard ? (

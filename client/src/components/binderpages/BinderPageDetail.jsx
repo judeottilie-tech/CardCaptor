@@ -53,9 +53,6 @@ export default function BinderPageDetail() {
     setSelectedSlotId(null);
   };
 
-  // Card slot changes are staged locally in pendingSlots and only persisted
-  // when the (always-visible, independent of the title/description edit
-  // mode) Save button below the grid is clicked.
   const handlePickCard = (card) => {
     setPendingSlots((slots) =>
       slots.map((s) => (s.id === selectedSlotId ? { ...s, cardId: card.id, card } : s)),
@@ -69,9 +66,6 @@ export default function BinderPageDetail() {
     );
   };
 
-  // Drag-and-drop swaps (or moves, if the target is empty) two slots'
-  // cards — staged in pendingSlots just like a CardPicker pick, so it
-  // still requires the Save button below to persist.
   const handleSlotDragStart = (slotId) => (e) => {
     setDraggedSlotId(slotId);
     e.dataTransfer.effectAllowed = "move";
