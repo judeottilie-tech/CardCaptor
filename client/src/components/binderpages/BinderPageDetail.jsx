@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   getBinderPageById,
@@ -44,7 +44,11 @@ export default function BinderPageDetail() {
     return () => controller.abort();
   }, [id]);
 
+  const dragStateRef = useRef({ startX: 0, startY: 0, sourceId: null, dragging: false, overId: null });
+  const suppressClickRef = useRef(false);
+
   const handleSelectSlot = (slotId) => {
+    if (suppressClickRef.current) return;
     setSelectedSlotId(slotId);
   };
 
@@ -65,34 +69,7 @@ export default function BinderPageDetail() {
     );
   };
 
-  const handleSlotDragStart = (slotId) => (e) => {
-    setDraggedSlotId(slotId);
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text/plain", String(slotId));
-  };
-
-  const handleSlotDragEnd = () => {
-    setDraggedSlotId(null);
-    setDragOverSlotId(null);
-  };
-
-  const handleSlotDragOver = (slotId) => (e) => {
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    if (dragOverSlotId !== slotId) setDragOverSlotId(slotId);
-  };
-
-  const handleSlotDragLeave = (slotId) => () => {
-    setDragOverSlotId((current) => (current === slotId ? null : current));
-  };
-
-  const handleSlotDrop = (targetSlotId) => (e) => {
-    e.preventDefault();
-    const sourceSlotId = Number(e.dataTransfer.getData("text/plain"));
-    setDraggedSlotId(null);
-    setDragOverSlotId(null);
-    if (!sourceSlotId || sourceSlotId === targetSlotId) return;
-
+  const swapSlots = (sourceSlotId, targetSlotId) => {
     setPendingSlots((slots) => {
       const source = slots.find((s) => s.id === sourceSlotId);
       const target = slots.find((s) => s.id === targetSlotId);
@@ -104,6 +81,66 @@ export default function BinderPageDetail() {
       });
     });
   };
+
+  const handleSlotPointerDown = (slotId) => (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragStateRef.current = { startX: e.clientX, startY: e.clientY, sourceId: slotId, dragging: false, overId: null };
+  };
+
+  // Native HTML5 drag-and-drop (draggable/dragstart/drop) never fires on
+  // touch devices at all, so slot reordering is built on Pointer Events
+  // instead - they fire uniformly for mouse and touch. A small movement
+  // threshold distinguishes an actual drag from a tap that should just
+  // open the card picker.
+  useEffect(() => {
+    const DRAG_THRESHOLD = 10;
+
+    const handlePointerMove = (e) => {
+      const state = dragStateRef.current;
+      if (!state.sourceId) return;
+
+      if (!state.dragging) {
+        const dx = e.clientX - state.startX;
+        const dy = e.clientY - state.startY;
+        if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+        state.dragging = true;
+        setDraggedSlotId(state.sourceId);
+      }
+
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const targetEl = el?.closest("[data-slot-id]");
+      const targetId = targetEl ? Number(targetEl.dataset.slotId) : null;
+      if (targetId !== state.overId) {
+        state.overId = targetId;
+        setDragOverSlotId(targetId);
+      }
+    };
+
+    const handlePointerUp = () => {
+      const state = dragStateRef.current;
+      if (state.dragging) {
+        suppressClickRef.current = true;
+        setTimeout(() => {
+          suppressClickRef.current = false;
+        }, 0);
+        if (state.sourceId && state.overId && state.overId !== state.sourceId) {
+          swapSlots(state.sourceId, state.overId);
+        }
+      }
+      dragStateRef.current = { startX: 0, startY: 0, sourceId: null, dragging: false, overId: null };
+      setDraggedSlotId(null);
+      setDragOverSlotId(null);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
+    };
+  }, []);
 
   const goToDashboard = () => navigate("/");
 
@@ -197,12 +234,12 @@ export default function BinderPageDetail() {
                   className="font-heading text-xl font-bold border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
                   autoFocus
                 />
-                <input
-                  type="text"
+                <textarea
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   placeholder="Add a description or notes..."
-                  className="text-sm border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
+                  rows={3}
+                  className="text-sm border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose resize-none w-full"
                 />
                 <div className="flex justify-end items-center gap-2 mt-2">
                   {justSaved && <span className="text-green-400 text-sm mr-auto">Saved</span>}
@@ -264,11 +301,7 @@ export default function BinderPageDetail() {
               slot={slot}
               onSelect={() => handleSelectSlot(slot.id)}
               onRemove={() => handleRemoveCard(slot.id)}
-              onDragStart={slot.card ? handleSlotDragStart(slot.id) : undefined}
-              onDragEnd={handleSlotDragEnd}
-              onDragOver={handleSlotDragOver(slot.id)}
-              onDragLeave={handleSlotDragLeave(slot.id)}
-              onDrop={handleSlotDrop(slot.id)}
+              onPointerDown={slot.card ? handleSlotPointerDown(slot.id) : undefined}
               isDragging={draggedSlotId === slot.id}
               isDragOver={dragOverSlotId === slot.id && draggedSlotId !== slot.id}
             />
