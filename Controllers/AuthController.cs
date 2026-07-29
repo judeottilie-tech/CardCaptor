@@ -113,14 +113,27 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegistrationDTO registration)
     {
+        if (!PokemonStarters.IsValidStarter(registration.StarterPokemon))
+        {
+            return BadRequest("Invalid starter Pokemon.");
+        }
+
+        string password;
+        try
+        {
+            password = Encoding
+                .GetEncoding("iso-8859-1")
+                .GetString(Convert.FromBase64String(registration.Password));
+        }
+        catch (Exception)
+        {
+            return BadRequest("Invalid password encoding.");
+        }
+
         var user = new IdentityUser
         {
             UserName = registration.UserName
         };
-
-        var password = Encoding
-        .GetEncoding("iso-8859-1")
-        .GetString(Convert.FromBase64String(registration.Password));
 
         var result = await _userManager.CreateAsync(user, password);
         if (result.Succeeded)
@@ -128,7 +141,11 @@ public class AuthController : ControllerBase
             _dbContext.UserProfiles.Add(new UserProfile
             {
                 DisplayName = registration.DisplayName,
-                IdentityUserId = user.Id
+                IdentityUserId = user.Id,
+                StarterPokemon = registration.StarterPokemon,
+                PetFeedCount = 0,
+                PetFullness = 100,
+                PetLastFedAt = DateTime.UtcNow
             });
             _dbContext.SaveChanges();
 

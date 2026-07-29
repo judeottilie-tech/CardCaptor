@@ -33,6 +33,9 @@ namespace CardCaptor.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -44,16 +47,7 @@ namespace CardCaptor.Migrations
 
                     b.HasIndex("UserProfileId");
 
-                    b.ToTable("BinderPages", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 7, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Title = "Demo Binder",
-                            UserProfileId = 2
-                        });
+                    b.ToTable("BinderPages");
                 });
 
             modelBuilder.Entity("CardCaptor.Models.BinderPageCardSlot", b =>
@@ -79,67 +73,7 @@ namespace CardCaptor.Migrations
 
                     b.HasIndex("CardId");
 
-                    b.ToTable("BinderPageCardSlots", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            BinderPageId = 1,
-                            CardId = 4,
-                            Position = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            BinderPageId = 1,
-                            CardId = 15,
-                            Position = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            BinderPageId = 1,
-                            CardId = 2,
-                            Position = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            BinderPageId = 1,
-                            CardId = 10,
-                            Position = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            BinderPageId = 1,
-                            Position = 5
-                        },
-                        new
-                        {
-                            Id = 6,
-                            BinderPageId = 1,
-                            Position = 6
-                        },
-                        new
-                        {
-                            Id = 7,
-                            BinderPageId = 1,
-                            Position = 7
-                        },
-                        new
-                        {
-                            Id = 8,
-                            BinderPageId = 1,
-                            Position = 8
-                        },
-                        new
-                        {
-                            Id = 9,
-                            BinderPageId = 1,
-                            Position = 9
-                        });
+                    b.ToTable("BinderPageCardSlots");
                 });
 
             modelBuilder.Entity("CardCaptor.Models.Card", b =>
@@ -150,6 +84,14 @@ namespace CardCaptor.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Era")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -158,311 +100,28 @@ namespace CardCaptor.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Rarity")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SetName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SourceId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Types")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Cards", (string)null);
+                    b.HasIndex("SourceId")
+                        .IsUnique();
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/1.jpg",
-                            Name = "Alakazam"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/2.jpg",
-                            Name = "Blastoise"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/3.jpg",
-                            Name = "Chansey"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/4.jpg",
-                            Name = "Charizard"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/5.jpg",
-                            Name = "Clefairy"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/6.jpg",
-                            Name = "Gyarados"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/7.jpg",
-                            Name = "Hitmonchan"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/8.jpg",
-                            Name = "Machamp"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/9.jpg",
-                            Name = "Magneton"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/10.jpg",
-                            Name = "Mewtwo"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/11.jpg",
-                            Name = "Nidoking"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/12.jpg",
-                            Name = "Ninetales"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/13.jpg",
-                            Name = "Poliwrath"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/14.jpg",
-                            Name = "Raichu"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/15.jpg",
-                            Name = "Venusaur"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/16.jpg",
-                            Name = "Zapdos"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/17.jpg",
-                            Name = "Beedrill"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/18.jpg",
-                            Name = "Dragonair"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/19.jpg",
-                            Name = "Dugtrio"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/20.jpg",
-                            Name = "Electabuzz"
-                        },
-                        new
-                        {
-                            Id = 21,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/21.jpg",
-                            Name = "Electrode"
-                        },
-                        new
-                        {
-                            Id = 22,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/22.jpg",
-                            Name = "Pidgeotto"
-                        },
-                        new
-                        {
-                            Id = 23,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/23.jpg",
-                            Name = "Arcanine"
-                        },
-                        new
-                        {
-                            Id = 24,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/24.jpg",
-                            Name = "Charmeleon"
-                        },
-                        new
-                        {
-                            Id = 25,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/25.jpg",
-                            Name = "Dewgong"
-                        },
-                        new
-                        {
-                            Id = 26,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/26.jpg",
-                            Name = "Dratini"
-                        },
-                        new
-                        {
-                            Id = 27,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/27.jpg",
-                            Name = "Farfetch'd"
-                        },
-                        new
-                        {
-                            Id = 28,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/28.jpg",
-                            Name = "Growlithe"
-                        },
-                        new
-                        {
-                            Id = 29,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/29.jpg",
-                            Name = "Haunter"
-                        },
-                        new
-                        {
-                            Id = 30,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/30.jpg",
-                            Name = "Ivysaur"
-                        },
-                        new
-                        {
-                            Id = 31,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/31.jpg",
-                            Name = "Jynx"
-                        },
-                        new
-                        {
-                            Id = 32,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/32.jpg",
-                            Name = "Kadabra"
-                        },
-                        new
-                        {
-                            Id = 33,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/33.jpg",
-                            Name = "Kakuna"
-                        },
-                        new
-                        {
-                            Id = 34,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/34.jpg",
-                            Name = "Machoke"
-                        },
-                        new
-                        {
-                            Id = 35,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/35.jpg",
-                            Name = "Magikarp"
-                        },
-                        new
-                        {
-                            Id = 36,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/36.jpg",
-                            Name = "Magmar"
-                        },
-                        new
-                        {
-                            Id = 37,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/37.jpg",
-                            Name = "Nidorino"
-                        },
-                        new
-                        {
-                            Id = 38,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/38.jpg",
-                            Name = "Poliwhirl"
-                        },
-                        new
-                        {
-                            Id = 39,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/39.jpg",
-                            Name = "Porygon"
-                        },
-                        new
-                        {
-                            Id = 40,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/40.jpg",
-                            Name = "Raticate"
-                        },
-                        new
-                        {
-                            Id = 41,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/41.jpg",
-                            Name = "Seel"
-                        },
-                        new
-                        {
-                            Id = 42,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/42.jpg",
-                            Name = "Wartortle"
-                        },
-                        new
-                        {
-                            Id = 43,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/43.jpg",
-                            Name = "Abra"
-                        },
-                        new
-                        {
-                            Id = 44,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/44.jpg",
-                            Name = "Bulbasaur"
-                        },
-                        new
-                        {
-                            Id = 45,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/45.jpg",
-                            Name = "Caterpie"
-                        },
-                        new
-                        {
-                            Id = 46,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/46.jpg",
-                            Name = "Charmander"
-                        },
-                        new
-                        {
-                            Id = 47,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/47.jpg",
-                            Name = "Diglett"
-                        },
-                        new
-                        {
-                            Id = 48,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/48.jpg",
-                            Name = "Doduo"
-                        },
-                        new
-                        {
-                            Id = 49,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/49.jpg",
-                            Name = "Drowzee"
-                        },
-                        new
-                        {
-                            Id = 50,
-                            ImageUrl = "https://tcg.one/scans/l/base_set/50.jpg",
-                            Name = "Gastly"
-                        });
+                    b.ToTable("Cards");
                 });
 
             modelBuilder.Entity("CardCaptor.Models.UserProfile", b =>
@@ -481,24 +140,35 @@ namespace CardCaptor.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("PetFeedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("PetFullness")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("PetLastFedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("StarterPokemon")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("IdentityUserId");
 
-                    b.ToTable("UserProfiles", (string)null);
+                    b.ToTable("UserProfiles");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
                             DisplayName = "Administrator",
-                            IdentityUserId = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DisplayName = "Demo User",
-                            IdentityUserId = "14e95ce0-ccca-4a12-a26d-6354d318ac70"
+                            IdentityUserId = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
+                            PetFeedCount = 0,
+                            PetFullness = 100.0,
+                            PetLastFedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StarterPokemon = "Bulbasaur"
                         });
                 });
 
@@ -621,29 +291,15 @@ namespace CardCaptor.Migrations
                         {
                             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1ac5ed5e-321b-43a5-b5cf-601f116f2bc8",
+                            ConcurrencyStamp = "02a7b74f-8791-44ca-a5de-9df186536535",
                             Email = "admin@cardcaptor.comx",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAELeRD5li3MF+nAJ9iMNI/VKQbd5ZG9hmkK4GCTB98QQA5rRUAustisDll7qQJ6r8Gw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAED0YJuo3oc5NA8508V9DErvgMXDo9tWsE/tk5CM/YSRKFtvtFxLcV9rK/LrgD2lrGg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d0421a93-dfa7-4b35-9b06-c6254a3482cc",
+                            SecurityStamp = "da5dbabd-64d1-459d-afd7-ffaf17478737",
                             TwoFactorEnabled = false,
                             UserName = "Administrator"
-                        },
-                        new
-                        {
-                            Id = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "d589739e-9dd7-4586-b3ad-47e17346df25",
-                            Email = "demo@cardcaptor.comx",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEGfhBSqTZy9X/pudDnRxhjAEo35uUukm2f8FNovsAAIPDt8ZrtzYacz3fdrAQicxgw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "156d41da-d344-4a10-9d95-31e08decba92",
-                            TwoFactorEnabled = false,
-                            UserName = "DemoUser"
                         });
                 });
 
