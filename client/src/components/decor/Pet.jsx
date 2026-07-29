@@ -65,7 +65,7 @@ export default function Pet({ pet, setPet }) {
   };
 
   return (
-    <div className="fixed right-5 bottom-5 z-40 flex flex-col items-center">
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 sm:left-auto sm:right-5 sm:translate-x-0 z-40 flex flex-col items-center">
       <AnimatePresence>
         {evolvedTo && (
           <motion.div
@@ -115,7 +115,7 @@ export default function Pet({ pet, setPet }) {
           <img
             src={getSpriteUrl(pet.currentPokemon)}
             alt={pet.currentPokemon}
-            className="h-32 w-32 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
+            className="h-16 w-16 sm:h-32 sm:w-32 object-contain drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"
           />
         </button>
       </motion.div>
