@@ -8,7 +8,7 @@ let uid = 0;
 export default function Star({
   variant = "a",
   className = "",
-  colors = ["#F59BAD", "#778BBE"],
+  colors = ["#d137bf", "#7971FC"],
 }) {
   const id = `star-grad-${(uid += 1)}`;
   return (

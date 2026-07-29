@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../managers/authManager";
-import Heart from "../decor/heart";
-
 
 export default function Login({ setLoggedInUser }) {
   const navigate = useNavigate();
@@ -32,7 +30,6 @@ export default function Login({ setLoggedInUser }) {
       <div className="bg-white/5 rounded-2xl p-6 sm:p-8">
         <h3 className="inline-flex items-center gap-1.5 text-xl font-bold mb-4">
           Login
-          <Heart className="h-4 w-4" color="#F59BAD" />
         </h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -79,7 +76,13 @@ export default function Login({ setLoggedInUser }) {
           </button>
         </form>
         <p className="mt-4">
-          Not signed up? Register <Link to="/register">here</Link>
+          Not signed up?{" "}
+          <Link
+            to="/register"
+            className="text-brand-sky underline decoration-2 underline-offset-2 hover:text-brand-lavender font-semibold"
+          >
+            Register here
+          </Link>
         </p>
       </div>
     </div>

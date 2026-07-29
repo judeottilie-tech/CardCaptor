@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Sparkle from "./sparkle";
 
-const COLORS = ["#FAD0D5", "#F59BAD", "#778BBE", "#9EDEF9"];
+const COLORS = ["#FD8CEA", "#d137bf", "#7971FC", "#2AD3DC"];
 
 let uid = 0;
 

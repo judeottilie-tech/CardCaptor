@@ -1,9 +1,7 @@
 import Sparkle from "./sparkle";
 
-const COLORS = ["#FAD0D5", "#F59BAD", "#778BBE", "#9EDEF9"];
+const COLORS = ["#FD8CEA", "#d137bf", "#7971FC", "#2AD3DC"];
 
-// Deterministic scatter presets so each section reads a little differently
-// without needing real randomness (keeps markup stable).
 const SETS = {
   1: [
     { top: "6%", side: "left", offset: "3%", size: 10, rotate: -18, c: 0 },
