@@ -1,9 +1,11 @@
-const _apiUrl = "/api/auth";
+import { API_BASE } from "./apiConfig";
+
+const _apiUrl = `${API_BASE}/auth`;
 
 export const login = (username, password) => {
     return fetch(_apiUrl + "/login", {
         method: "POST",
-        credentials: "same-origin",
+        credentials: "include",
         headers: {
             Authorization: `Basic ${btoa(`${username}:${password}`)}`,
         },
@@ -17,11 +19,11 @@ export const login = (username, password) => {
 };
 
 export const logout = () => {
-    return fetch(_apiUrl + "/logout");
+    return fetch(_apiUrl + "/logout", { credentials: "include" });
 };
 
 export const tryGetLoggedInUser = (signal) => {
-    return fetch(_apiUrl + "/me", { signal }).then((res) => {
+    return fetch(_apiUrl + "/me", { credentials: "include", signal }).then((res) => {
         return res.status === 401 ? Promise.resolve(null) : res.json();
     });
 };
@@ -29,7 +31,7 @@ export const tryGetLoggedInUser = (signal) => {
 export const register = (userProfile) => {
     userProfile.password = btoa(userProfile.password);
     return fetch(_apiUrl + "/register", {
-        credentials: "same-origin",
+        credentials: "include",
         method: "POST",
         headers: {
             "Content-Type": "application/json",

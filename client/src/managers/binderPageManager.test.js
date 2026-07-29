@@ -21,7 +21,7 @@ describe("binderPageManager", () => {
 
     expect(global.fetch).toHaveBeenCalledWith(
       "/api/binderpage",
-      expect.objectContaining({ credentials: "same-origin" }),
+      expect.objectContaining({ credentials: "include" }),
     );
     expect(result).toEqual([{ id: 1, title: "Page 1" }]);
   });

@@ -13,7 +13,7 @@ describe("petManager", () => {
 
     const result = await getPet();
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/pet", expect.objectContaining({ credentials: "same-origin" }));
+    expect(global.fetch).toHaveBeenCalledWith("/api/pet", expect.objectContaining({ credentials: "include" }));
     expect(result).toEqual({ currentPokemon: "Bulbasaur" });
   });
 
