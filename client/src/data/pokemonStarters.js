@@ -31,10 +31,6 @@ export const STARTER_LINES = [
 export const getSpriteUrl = (pokemonName) =>
   `https://play.pokemonshowdown.com/sprites/ani/${pokemonName.toLowerCase()}.gif`;
 
-// National Pokedex numbers, only for the starter-line Pokemon this app uses
-// (not a general-purpose dex map) — used to fetch PMD Collab's square
-// portrait art for small icon contexts (e.g. the navbar avatar), which reads
-// much better at icon size than the tall animated battle sprite.
 const NATIONAL_DEX_NUMBER = {
   Bulbasaur: 1, Ivysaur: 2, Venusaur: 3,
   Charmander: 4, Charmeleon: 5, Charizard: 6,
