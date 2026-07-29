@@ -11,11 +11,7 @@ export default function CardSlot({
   slot,
   onSelect,
   onRemove,
-  onDragStart,
-  onDragEnd,
-  onDragOver,
-  onDragLeave,
-  onDrop,
+  onPointerDown,
   isDragging,
   isDragOver,
 }) {
@@ -27,14 +23,11 @@ export default function CardSlot({
             ? "border-2 border-brand-rose bg-brand-blush/30"
             : "border-brand-periwinkle/30"
         } ${isDragging ? "opacity-40" : ""}`}
+        style={{ touchAction: "none" }}
         role="button"
         tabIndex={0}
-        draggable
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
+        data-slot-id={slot.id}
+        onPointerDown={onPointerDown}
         onClick={onSelect}
         onKeyDown={handleActivateKey(onSelect)}
         aria-label={`${slot.card.name}, slot ${slot.position}. Press Enter to change card, or drag to move it to another slot.`}
@@ -75,9 +68,7 @@ export default function CardSlot({
       }`}
       role="button"
       tabIndex={0}
-      onDragOver={onDragOver}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
+      data-slot-id={slot.id}
       onClick={onSelect}
       onKeyDown={handleActivateKey(onSelect)}
       aria-label={`Empty slot ${slot.position}. Press Enter to add a card, or drop a card here to move it.`}

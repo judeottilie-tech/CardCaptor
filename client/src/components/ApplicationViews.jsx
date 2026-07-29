@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom'
 import { AuthorizedRoute } from './auth/AuthorizedRoute'
+import { GuestRoute } from './auth/GuestRoute'
 import Login from './auth/Login'
 import Register from './auth/Register'
 import BinderPageList from './binderpages/BinderPageList'
@@ -44,11 +45,19 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
       />
       <Route
         path="login"
-        element={<Login setLoggedInUser={setLoggedInUser} />}
+        element={
+          <GuestRoute loggedInUser={loggedInUser}>
+            <Login setLoggedInUser={setLoggedInUser} />
+          </GuestRoute>
+        }
       />
       <Route
         path="register"
-        element={<Register setLoggedInUser={setLoggedInUser} />}
+        element={
+          <GuestRoute loggedInUser={loggedInUser}>
+            <Register setLoggedInUser={setLoggedInUser} />
+          </GuestRoute>
+        }
       />
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
     </Routes>
