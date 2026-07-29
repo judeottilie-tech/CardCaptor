@@ -8,16 +8,10 @@ export default {
         body: ["Lexend", "sans-serif"],
       },
       colors: {
-        // Navy+neon base. `ink` is the near-black page background, `cream`
-        // is the light "paper" surface color for panels/inputs. Decorative
-        // stickers (Heart/Sparkle instances on Login/Register/BinderPageList)
-        // pass their own hardcoded soft-pastel hex directly as a `color`
-        // prop — they aren't Tailwind classes, so they're unaffected by
-        // this token set either way.
         brand: {
           ink: "#000336",
           cream: "#FDF8E6",
-          rose: "#F913DE",
+          rose: "#d137bf",
           blush: "#FD8CEA",
           periwinkle: "#7971FC",
           sky: "#2AD3DC",

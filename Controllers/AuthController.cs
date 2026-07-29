@@ -118,14 +118,22 @@ public class AuthController : ControllerBase
             return BadRequest("Invalid starter Pokemon.");
         }
 
+        string password;
+        try
+        {
+            password = Encoding
+                .GetEncoding("iso-8859-1")
+                .GetString(Convert.FromBase64String(registration.Password));
+        }
+        catch (Exception)
+        {
+            return BadRequest("Invalid password encoding.");
+        }
+
         var user = new IdentityUser
         {
             UserName = registration.UserName
         };
-
-        var password = Encoding
-        .GetEncoding("iso-8859-1")
-        .GetString(Convert.FromBase64String(registration.Password));
 
         var result = await _userManager.CreateAsync(user, password);
         if (result.Succeeded)

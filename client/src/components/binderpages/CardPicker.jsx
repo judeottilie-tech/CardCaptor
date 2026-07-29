@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { getCards } from "../../managers/cardManager";
 
-// Keep at/below the ~20-request burst that assets.tcgdex.net can reliably
-// serve at once — going higher (tried 24) caused widespread image failures.
-// Sized per breakpoint so the grid is a clean, complete rectangle that fits
-// the modal without scrolling: 3 cols x 3 rows on mobile, 4 cols x 3 rows
-// on sm+ (matches Tailwind's `sm` breakpoint, used for grid-cols below).
 const MOBILE_PAGE_SIZE = 9;
 const DESKTOP_PAGE_SIZE = 12;
 const DESKTOP_BREAKPOINT = "(min-width: 640px)";
@@ -33,9 +28,10 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [selectedCard, setSelectedCard] = useState(currentCard || null);
-  const [searchInput, setSearchInput] = useState(currentCard?.name || "");
-  const [search, setSearch] = useState(currentCard?.name || "");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+  const [rarity, setRarity] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadedIds, setLoadedIds] = useState(new Set());
   const [isDesktop, setIsDesktop] = useState(
@@ -64,7 +60,7 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    getCards({ page, pageSize, search, category }, controller.signal)
+    getCards({ page, pageSize, search, category, rarity }, controller.signal)
       .then(({ cards, totalCount }) => {
         setCards(cards);
         setTotalCount(totalCount);
@@ -77,13 +73,18 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
         }
       });
     return () => controller.abort();
-  }, [page, pageSize, search, category]);
+  }, [page, pageSize, search, category, rarity]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
   const pageItems = getPageItems(page, totalPages);
 
   const handleCategoryChange = (e) => {
     setCategory(e.target.value);
+    setPage(1);
+  };
+
+  const handleRarityChange = (e) => {
+    setRarity(e.target.value);
     setPage(1);
   };
 
@@ -129,12 +130,34 @@ export default function CardPicker({ onPick, onClose, currentCard }) {
             <option value="Trainer">Trainer</option>
             <option value="Energy">Energy</option>
           </select>
+          <label htmlFor="card-rarity" className="sr-only">
+            Filter by rarity
+          </label>
+          <select
+            id="card-rarity"
+            value={rarity}
+            onChange={handleRarityChange}
+            className="border border-brand-periwinkle/40 rounded px-3 py-2 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
+          >
+            <option value="">All rarities</option>
+            <option value="Common">Common</option>
+            <option value="Uncommon">Uncommon</option>
+            <option value="Rare">Rare</option>
+            <option value="Amazing Rare">Amazing Rare</option>
+            <option value="Full Art Trainer">Full Art Trainer</option>
+            <option value="Black White Rare">Black White Rare</option>
+            <option value="Shiny rare V">Shiny rare V</option>
+            <option value="Shiny rare VMAX">Shiny rare VMAX</option>
+            <option value="Shiny Ultra Rare">Shiny Ultra Rare</option>
+            <option value="Illustration rare">Illustration Rare</option>
+            <option value="Special illustration rare">Special Illustration Rare</option>
+            <option value="Secret Rare">Secret Rare</option>
+            <option value="Hyper rare">Hyper Rare</option>
+            <option value="Mega Hyper Rare">Mega Hyper Rare</option>
+          </select>
         </div>
 
         <div className="flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
-          {/* Preview frame — desktop/tablet only. On mobile there's no room
-              for it, so selecting a card just rings its thumbnail and lights
-              up Confirm in the bar below. */}
           <div className="hidden sm:flex sm:order-2 w-full sm:w-64 shrink-0 flex-col items-center gap-2 border-2 border-dashed border-brand-periwinkle/40 rounded-lg p-3">
             <div className="w-full aspect-[5/7] rounded overflow-hidden bg-brand-blush/10 flex items-center justify-center">
               {selectedCard ? (

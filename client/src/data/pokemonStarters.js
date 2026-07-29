@@ -30,3 +30,39 @@ export const STARTER_LINES = [
 
 export const getSpriteUrl = (pokemonName) =>
   `https://play.pokemonshowdown.com/sprites/ani/${pokemonName.toLowerCase()}.gif`;
+
+const NATIONAL_DEX_NUMBER = {
+  Bulbasaur: 1, Ivysaur: 2, Venusaur: 3,
+  Charmander: 4, Charmeleon: 5, Charizard: 6,
+  Squirtle: 7, Wartortle: 8, Blastoise: 9,
+  Chikorita: 152, Bayleef: 153, Meganium: 154,
+  Cyndaquil: 155, Quilava: 156, Typhlosion: 157,
+  Totodile: 158, Croconaw: 159, Feraligatr: 160,
+  Treecko: 252, Grovyle: 253, Sceptile: 254,
+  Torchic: 255, Combusken: 256, Blaziken: 257,
+  Mudkip: 258, Marshtomp: 259, Swampert: 260,
+  Turtwig: 387, Grotle: 388, Torterra: 389,
+  Chimchar: 390, Monferno: 391, Infernape: 392,
+  Piplup: 393, Prinplup: 394, Empoleon: 395,
+  Snivy: 495, Servine: 496, Serperior: 497,
+  Tepig: 498, Pignite: 499, Emboar: 500,
+  Oshawott: 501, Dewott: 502, Samurott: 503,
+  Chespin: 650, Quilladin: 651, Chesnaught: 652,
+  Fennekin: 653, Braixen: 654, Delphox: 655,
+  Froakie: 656, Frogadier: 657, Greninja: 658,
+  Rowlet: 722, Dartrix: 723, Decidueye: 724,
+  Litten: 725, Torracat: 726, Incineroar: 727,
+  Popplio: 728, Brionne: 729, Primarina: 730,
+  Grookey: 810, Thwackey: 811, Rillaboom: 812,
+  Scorbunny: 813, Raboot: 814, Cinderace: 815,
+  Sobble: 816, Drizzile: 817, Inteleon: 818,
+  Sprigatito: 906, Floragato: 907, Meowscarada: 908,
+  Fuecoco: 909, Crocalor: 910, Skeledirge: 911,
+  Quaxly: 912, Quaxwell: 913, Quaquaval: 914,
+};
+
+export const getPortraitUrl = (pokemonName) => {
+  const dexNumber = NATIONAL_DEX_NUMBER[pokemonName];
+  const id = String(dexNumber).padStart(4, "0");
+  return `https://raw.githubusercontent.com/PMDCollab/SpriteCollab/master/portrait/${id}/Normal.png`;
+};

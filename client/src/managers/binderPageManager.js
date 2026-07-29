@@ -19,10 +19,7 @@ export const createBinderPage = (binderPage) => {
     credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(binderPage),
-  }).then((res) => {
-    if (res.ok) return res.json();
-    return res.json();
-  });
+  }).then((res) => res.json());
 };
 
 export const updateBinderPage = (id, binderPage) => {

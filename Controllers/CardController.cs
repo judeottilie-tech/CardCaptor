@@ -21,6 +21,9 @@ public class CardController : ControllerBase
     [Authorize]
     public IActionResult Get(string? search, string? category, string? rarity, string? era, int page = 1, int pageSize = 60)
     {
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
         var query = _dbContext.Cards.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -46,6 +49,7 @@ public class CardController : ControllerBase
         var totalCount = query.Count();
 
         var cards = query
+            .OrderBy(c => c.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToList();
