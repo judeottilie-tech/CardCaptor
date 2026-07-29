@@ -20,6 +20,12 @@ export default function Login({ setLoggedInUser }) {
     });
   };
 
+  const fillDemoAccount = () => {
+    setFailedLogin(false);
+    setUserName("DemoUser");
+    setPassword("Demo1234");
+  };
+
   const inputClass = (invalid) =>
     `w-full border rounded px-3 py-2 bg-white text-brand-ink focus:outline-none focus:border-brand-rose ${
       invalid ? "border-red-500" : "border-brand-periwinkle/40"
@@ -68,12 +74,21 @@ export default function Login({ setLoggedInUser }) {
             )}
           </div>
 
-          <button
-            type="submit"
-            className="px-4 py-2 rounded bg-brand-rose hover:bg-brand-rose/90 text-brand-ink font-semibold"
-          >
-            Login
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-brand-rose hover:bg-brand-rose/90 text-brand-ink font-semibold"
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              onClick={fillDemoAccount}
+              className="px-4 py-2 rounded border border-brand-periwinkle/40 hover:bg-brand-blush/10"
+            >
+              Try Demo
+            </button>
+          </div>
         </form>
         <p className="mt-4">
           Not signed up?{" "}

@@ -78,7 +78,7 @@ public class CardControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Get_WhenNotAuthenticated_ReturnsUnauthorized()
     {
-        var client = _factory.CreateClient();
+        var client = TestAuth.NewClient(_factory);
 
         var response = await client.GetAsync("/api/card");
 

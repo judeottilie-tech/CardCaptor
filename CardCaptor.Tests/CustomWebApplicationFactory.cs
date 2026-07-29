@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CardCaptor.Tests;
 
@@ -18,6 +19,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        // Skips Program.cs's own db.Database.Migrate() call (see the
+        // Environment check there) - several existing migrations embed raw
+        // Postgres-only SQL (e.g. NOW() in AddPetToUserProfile), which has
+        // no Sqlite equivalent. EnsureCreated() below builds schema straight
+        // from the current model instead, sidestepping that entirely.
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureAppConfiguration((_, config) =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>
@@ -37,13 +45,17 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             _connection.Open();
             services.AddDbContext<CardCaptorDbContext>(options => options.UseSqlite(_connection));
-
-            var provider = services.BuildServiceProvider();
-            using var scope = provider.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<CardCaptorDbContext>();
-            db.Database.EnsureCreated();
-            SeedCards(db);
         });
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
+        using var scope = host.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<CardCaptorDbContext>();
+        db.Database.EnsureCreated();
+        SeedCards(db);
+        return host;
     }
 
     private static void SeedCards(CardCaptorDbContext db)

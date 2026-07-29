@@ -5,6 +5,7 @@ import { tryGetLoggedInUser } from './managers/authManager'
 import { getPet } from './managers/petManager'
 import CursorTrail from './components/decor/cursorTrail'
 import Pet from './components/decor/Pet'
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState();
@@ -15,7 +16,7 @@ function App() {
     tryGetLoggedInUser(controller.signal)
       .then((user) => setLoggedInUser(user))
       .catch((err) => {
-        if (err.name !== "AbortError") throw err;
+        if (err.name !== "AbortError") setLoggedInUser(null);
       });
     return () => controller.abort();
   }, []);
@@ -42,11 +43,16 @@ function App() {
     <>
       <CursorTrail />
       {loggedInUser && <Pet pet={pet} setPet={setPet} />}
-      <NavBar loggedInUser={loggedInUser} setLoggedInUser={setLoggedInUser} pet={pet} />
+      <NavBar
+        loggedInUser={loggedInUser}
+        setLoggedInUser={setLoggedInUser}
+        pet={pet}
+      />
       <ApplicationViews
         loggedInUser={loggedInUser}
         setLoggedInUser={setLoggedInUser}
       />
+      <Analytics />
     </>
   );
 }

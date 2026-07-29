@@ -28,7 +28,7 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Register_WithInvalidStarter_ReturnsBadRequest()
     {
-        var client = _factory.CreateClient();
+        var client = TestAuth.NewClient(_factory);
 
         var response = await client.PostAsJsonAsync("/api/auth/register", new
         {
@@ -47,7 +47,7 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         // Regression test: Register() used to have no try/catch around the
         // base64 decode, unlike Login(), so a malformed password crashed
         // with an unhandled FormatException instead of a controlled response.
-        var client = _factory.CreateClient();
+        var client = TestAuth.NewClient(_factory);
 
         var response = await client.PostAsJsonAsync("/api/auth/register", new
         {
@@ -66,7 +66,7 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         var username = $"user-{Guid.NewGuid():N}";
         await TestAuth.RegisterAndLoginAsync(_factory, username: username, password: "correct-password");
 
-        var client = _factory.CreateClient();
+        var client = TestAuth.NewClient(_factory);
         var response = await client.SendAsync(LoginRequest(username, "correct-password"));
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -78,7 +78,7 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         var username = $"user-{Guid.NewGuid():N}";
         await TestAuth.RegisterAndLoginAsync(_factory, username: username, password: "correct-password");
 
-        var client = _factory.CreateClient();
+        var client = TestAuth.NewClient(_factory);
         var response = await client.SendAsync(LoginRequest(username, "wrong-password"));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -87,7 +87,7 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Me_WhenNotLoggedIn_ReturnsUnauthorized()
     {
-        var client = _factory.CreateClient();
+        var client = TestAuth.NewClient(_factory);
 
         var response = await client.GetAsync("/api/auth/me");
 

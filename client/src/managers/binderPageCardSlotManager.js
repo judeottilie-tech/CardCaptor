@@ -1,9 +1,11 @@
-const _apiUrl = "/api/binderpagecardslot";
+import { API_BASE } from "./apiConfig";
+
+const _apiUrl = `${API_BASE}/binderpagecardslot`;
 
 export const attachCard = (slotId, cardId) => {
   return fetch(`${_apiUrl}/${slotId}/card`, {
     method: "PUT",
-    credentials: "same-origin",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ cardId }),
   });
@@ -12,6 +14,6 @@ export const attachCard = (slotId, cardId) => {
 export const removeCard = (slotId) => {
   return fetch(`${_apiUrl}/${slotId}/card`, {
     method: "DELETE",
-    credentials: "same-origin",
+    credentials: "include",
   });
 };
