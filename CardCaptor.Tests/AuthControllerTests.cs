@@ -94,6 +94,33 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    [Fact]
+    public async Task Login_AsDemoUser_ResetsDirtiedStateBackToPristine()
+    {
+        var firstVisit = TestAuth.NewClient(_factory);
+        await firstVisit.SendAsync(LoginRequest("DemoUser", "Demo1234"));
+
+        // A "previous visitor" leaves a mess: an extra binder page, and a fed pet.
+        await firstVisit.PostAsJsonAsync("/api/binderpage", new { title = "Some Other Page", description = (string?)null });
+        await firstVisit.PostAsync("/api/pet/feed", null);
+
+        var secondVisit = TestAuth.NewClient(_factory);
+        var loginResponse = await secondVisit.SendAsync(LoginRequest("DemoUser", "Demo1234"));
+        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
+
+        var pages = await secondVisit.GetFromJsonAsync<List<BinderPageSummary>>("/api/binderpage", TestJson.Options);
+        var page = Assert.Single(pages!);
+        Assert.Equal("Demo Binder", page.Title);
+
+        var detail = await secondVisit.GetFromJsonAsync<BinderPageDetail>($"/api/binderpage/{page.Id}", TestJson.Options);
+        Assert.Equal(9, detail!.BinderPageCardSlots.Count);
+        Assert.All(detail.BinderPageCardSlots, slot => Assert.Null(slot.CardId));
+
+        var pet = await secondVisit.GetFromJsonAsync<PetSummary>("/api/pet", TestJson.Options);
+        Assert.Equal(0, pet!.FeedCount);
+        Assert.Equal("Bulbasaur", pet.CurrentPokemon);
+    }
+
     private static HttpRequestMessage LoginRequest(string username, string password)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login");
@@ -104,4 +131,8 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     private record UserProfileResponse(int Id, string DisplayName, string UserName, string IdentityUserId);
+    private record BinderPageSummary(int Id, string Title);
+    private record BinderPageDetail(int Id, string Title, List<SlotSummary> BinderPageCardSlots);
+    private record SlotSummary(int Id, int? CardId);
+    private record PetSummary(string CurrentPokemon, int FeedCount);
 }
