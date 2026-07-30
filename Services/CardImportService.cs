@@ -86,15 +86,20 @@ public class CardImportService
         foreach (var sourceId in toImport)
         {
             var detail = await _http.GetFromJsonAsync<TcgdexCardDetail>($"cards/{sourceId}", JsonOptions);
-            if (detail == null)
+            if (detail == null || detail.Image == null)
             {
+                // TCGdex has no image at all for some cards (seen on the
+                // "Gallery" subsets - Crown Zenith Galarian Gallery, Trainer
+                // Gallery secondary numbering). A card with no art is useless
+                // in a visual binder app, so skip it entirely rather than
+                // importing it with an empty ImageUrl.
                 continue;
             }
 
             _dbContext.Cards.Add(new Card
             {
                 Name = detail.Name,
-                ImageUrl = detail.Image != null ? $"{detail.Image}/high.webp" : "",
+                ImageUrl = $"{detail.Image}/high.webp",
                 Rarity = detail.Rarity ?? "",
                 Types = detail.Types != null ? string.Join(",", detail.Types) : "",
                 Category = detail.Category ?? "",
