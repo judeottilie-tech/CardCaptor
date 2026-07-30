@@ -116,15 +116,24 @@ export default function BinderPageDetail() {
       }
     };
 
-    const handlePointerUp = () => {
+    const handlePointerUp = (e) => {
       const state = dragStateRef.current;
       if (state.dragging) {
         suppressClickRef.current = true;
         setTimeout(() => {
           suppressClickRef.current = false;
         }, 0);
-        if (state.sourceId && state.overId && state.overId !== state.sourceId) {
-          swapSlots(state.sourceId, state.overId);
+
+        // Determine the drop target fresh from the release position rather
+        // than trusting state.overId - on a longer/faster drag the browser
+        // can coalesce pointermove events, so the incrementally-tracked
+        // target can lag behind or miss the actual final position entirely.
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const targetEl = el?.closest("[data-slot-id]");
+        const finalTargetId = targetEl ? Number(targetEl.dataset.slotId) : null;
+
+        if (state.sourceId && finalTargetId && finalTargetId !== state.sourceId) {
+          swapSlots(state.sourceId, finalTargetId);
         }
       }
       dragStateRef.current = { startX: 0, startY: 0, sourceId: null, dragging: false, overId: null };
