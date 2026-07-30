@@ -35,7 +35,9 @@ export default function CardSlot({
         <img
           src={slot.card.imageUrl}
           alt={slot.card.name}
+          draggable={false}
           className="w-full h-full object-contain"
+          style={{ WebkitUserDrag: "none" }}
         />
         <button
           className="absolute top-0 right-0 w-7 h-7 rounded-bl-lg bg-black/40 hover:bg-black/60 border-l border-b border-white/30 opacity-70 hover:opacity-100 flex items-center justify-center transition-colors"
