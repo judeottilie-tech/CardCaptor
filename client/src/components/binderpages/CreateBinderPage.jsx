@@ -26,6 +26,7 @@ export default function CreateBinderPage() {
             </label>
             <input
               id="binderpage-title"
+              required
               className="w-full border border-brand-periwinkle/40 rounded px-3 py-2 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"
               value={title}
               onChange={(e) => setTitle(e.target.value)}

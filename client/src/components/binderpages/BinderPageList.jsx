@@ -44,7 +44,7 @@ export default function BinderPageList() {
             >
               <Link to={`/binderpages/${bp.id}`} className="min-w-0 flex-1">
                 <p className="font-semibold text-brand-cream hover:text-brand-lavender truncate">
-                  {bp.title}
+                  {bp.title || "Untitled Binder Page"}
                 </p>
                 {bp.description && (
                   <p className="text-sm text-brand-cream/50 truncate mt-0.5">
