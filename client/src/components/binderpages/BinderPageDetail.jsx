@@ -238,6 +238,7 @@ export default function BinderPageDetail() {
               <form onSubmit={handleUpdateBinder} className="flex flex-col gap-2">
                 <input
                   type="text"
+                  required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   className="font-heading text-xl font-bold border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose"

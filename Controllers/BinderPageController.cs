@@ -69,6 +69,8 @@ public class BinderPageController : ControllerBase
 
     public IActionResult Create(CreateBinderPageDTO dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Title)) return BadRequest("Title is required.");
+
         var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
@@ -102,6 +104,8 @@ public class BinderPageController : ControllerBase
 
     public IActionResult Update(int id, CreateBinderPageDTO dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Title)) return BadRequest("Title is required.");
+
         var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
