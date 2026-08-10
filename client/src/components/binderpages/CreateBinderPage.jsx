@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createBinderPage } from "../../managers/binderPageManager";
+import { LAYOUTS } from "../../data/binderPageLayouts";
 
 export default function CreateBinderPage() {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [layout, setLayout] = useState(LAYOUTS[1]);
+  const [isPublic, setIsPublic] = useState(false);
 
   const handleCreateBinderPage = (event) => {
     event.preventDefault();
-    const newBinderPage = { title, description };
+    const newBinderPage = {
+      title,
+      description,
+      rows: layout.rows,
+      columns: layout.columns,
+      isPublic,
+    };
     createBinderPage(newBinderPage).then((created) => {
       navigate(`/binderpages/${created.id}`);
     });
@@ -44,6 +53,42 @@ export default function CreateBinderPage() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Notes about this binder page..."
             />
+          </div>
+          <div className="mb-4">
+            <span className="block mb-1">Layout</span>
+            <div className="grid grid-cols-2 gap-2">
+              {LAYOUTS.map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => setLayout(option)}
+                  className={`px-3 py-2 rounded border text-sm font-semibold ${
+                    layout.rows === option.rows && layout.columns === option.columns
+                      ? "border-brand-rose bg-brand-rose/20"
+                      : "border-brand-periwinkle/40 hover:bg-brand-blush/10"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="mb-4">
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span>
+                Make this page public
+                <span className="text-brand-cream/50 font-normal">
+                  {" "}
+                  (visible to anyone at your profile, no login required)
+                </span>
+              </span>
+            </label>
           </div>
           <button
             type="submit"

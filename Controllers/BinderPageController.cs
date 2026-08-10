@@ -62,6 +62,22 @@ public class BinderPageController : ControllerBase
         return Ok(binderPage);
     }
 
+    //get /api/binderpage/{id}/public
+
+    [HttpGet("{id}/public")]
+    [AllowAnonymous]
+    public IActionResult GetPublic(int id)
+    {
+        var binderPage = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+                .ThenInclude(bpcs => bpcs.Card)
+            .SingleOrDefault(bp => bp.Id == id);
+
+        if (binderPage == null) return NotFound();
+        if (!binderPage.IsPublic) return NotFound();
+        return Ok(binderPage);
+    }
+
     // post /api/binderpage
 
     [HttpPost]
@@ -70,6 +86,7 @@ public class BinderPageController : ControllerBase
     public IActionResult Create(CreateBinderPageDTO dto)
     {
         if (string.IsNullOrWhiteSpace(dto.Title)) return BadRequest("Title is required.");
+        if (!BinderPageLayouts.IsValid(dto.Rows, dto.Columns)) return BadRequest("Invalid layout.");
 
         var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
@@ -79,17 +96,20 @@ public class BinderPageController : ControllerBase
         {
           Title = dto.Title,
           Description = dto.Description,
+          Rows = dto.Rows,
+          Columns = dto.Columns,
+          IsPublic = dto.IsPublic,
           UserProfileId = profile.Id,
           CreatedAt = DateTime.UtcNow
         };
         _dbContext.BinderPages.Add(binderPage);
         _dbContext.SaveChanges();
 
-        for (int position = 1; position <= 9; position++)
+        for (int position = 1; position <= dto.Rows * dto.Columns; position++)
         {
             _dbContext.BinderPageCardSlots.Add(new BinderPageCardSlot {
               Position = position,
-              BinderPageId = binderPage.Id  
+              BinderPageId = binderPage.Id
             });
         }
         _dbContext.SaveChanges();
@@ -116,10 +136,77 @@ public class BinderPageController : ControllerBase
 
         binderPage.Title = dto.Title;
         binderPage.Description = dto.Description;
+        binderPage.IsPublic = dto.IsPublic;
         _dbContext.SaveChanges();
 
         return NoContent();
 
+    }
+
+    //put /api/binderpage/{id}/layout
+
+    [HttpPut("{id}/layout")]
+    [Authorize]
+
+    public IActionResult UpdateLayout(int id, UpdateLayoutDTO dto)
+    {
+        if (!BinderPageLayouts.IsValid(dto.Rows, dto.Columns)) return BadRequest("Invalid layout.");
+
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
+        if (profile == null) return NotFound();
+
+        var binderPage = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+            .SingleOrDefault(bp => bp.Id == id);
+
+        if (binderPage == null) return NotFound();
+        if (binderPage.UserProfileId != profile.Id) return NotFound();
+
+        var newSlotCount = dto.Rows * dto.Columns;
+
+        // Shrinking: any slot beyond the new capacity is removed. A card sitting
+        // in one of those slots isn't deleted - it moves to the sideboard so the
+        // resize never silently loses a placed card.
+        var slotsToRemove = binderPage.BinderPageCardSlots
+            .Where(slot => slot.Position > newSlotCount)
+            .ToList();
+
+        foreach (var slot in slotsToRemove)
+        {
+            if (slot.CardId != null)
+            {
+                _dbContext.SideboardCards.Add(new SideboardCard
+                {
+                    UserProfileId = profile.Id,
+                    CardId = slot.CardId.Value,
+                    AddedAt = DateTime.UtcNow
+                });
+            }
+        }
+        _dbContext.BinderPageCardSlots.RemoveRange(slotsToRemove);
+
+        // Growing: add empty slots to fill out the new capacity.
+        var currentSlotCount = binderPage.BinderPageCardSlots.Count;
+        for (int position = currentSlotCount + 1; position <= newSlotCount; position++)
+        {
+            _dbContext.BinderPageCardSlots.Add(new BinderPageCardSlot
+            {
+                Position = position,
+                BinderPageId = binderPage.Id
+            });
+        }
+
+        binderPage.Rows = dto.Rows;
+        binderPage.Columns = dto.Columns;
+        _dbContext.SaveChanges();
+
+        var updated = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+                .ThenInclude(bpcs => bpcs.Card)
+            .Single(bp => bp.Id == id);
+
+        return Ok(updated);
     }
 
     //delete /api/binderpage/{id}

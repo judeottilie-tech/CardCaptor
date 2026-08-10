@@ -92,6 +92,13 @@ export default function NavBar({ loggedInUser, setLoggedInUser, pet }) {
                   >
                     New Binder Page
                   </NavLink>
+                  <NavLink
+                    to={`/u/${loggedInUser.userName}`}
+                    className={menuLinkClass}
+                    onClick={closeMenu}
+                  >
+                    My Public Profile
+                  </NavLink>
                 </div>
 
                 <div className="border-t border-brand-cream/10 py-1">
