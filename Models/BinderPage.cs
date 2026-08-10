@@ -7,6 +7,7 @@ public class BinderPage
     public string? Description { get; set; }
     public int Rows { get; set; }
     public int Columns { get; set; }
+    public bool IsPublic { get; set; }
     public int UserProfileId { get; set; }
     public DateTime CreatedAt { get; set; }
     public UserProfile UserProfile { get; set; }

@@ -12,6 +12,7 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Card> Cards { get; set; }
     public DbSet<BinderPageCardSlot> BinderPageCardSlots { get; set; }
     public DbSet<SideboardCard> SideboardCards { get; set; }
+    public DbSet<BinderPageLike> BinderPageLikes { get; set; }
 
     public CardCaptorDbContext(DbContextOptions<CardCaptorDbContext> context) : base(context)
     {
@@ -44,6 +45,10 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
 
         modelBuilder.Entity<Card>().HasIndex(c => c.SourceId).IsUnique();
 
+        modelBuilder.Entity<BinderPageLike>()
+            .HasIndex(bpl => new { bpl.BinderPageId, bpl.UserProfileId })
+            .IsUnique();
+
         modelBuilder.Entity<IdentityUser>().HasData(new IdentityUser
         {
             Id = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
@@ -72,6 +77,7 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             CreatedAt = new DateTime(2026, 7, 23),
             Rows = 3,
             Columns = 3,
+            IsPublic = false,
             UserProfileId = 2
         });
 

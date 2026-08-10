@@ -62,6 +62,49 @@ public class BinderPageController : ControllerBase
         return Ok(binderPage);
     }
 
+    //get /api/binderpage/{id}/public
+
+    [HttpGet("{id}/public")]
+    [AllowAnonymous]
+    public IActionResult GetPublic(int id)
+    {
+        var binderPage = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+                .ThenInclude(bpcs => bpcs.Card)
+            .SingleOrDefault(bp => bp.Id == id);
+
+        if (binderPage == null) return NotFound();
+        if (!binderPage.IsPublic) return NotFound();
+
+        int? currentProfileId = null;
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (identityUserId != null)
+        {
+            currentProfileId = _dbContext.UserProfiles
+                .Where(up => up.IdentityUserId == identityUserId)
+                .Select(up => (int?)up.Id)
+                .SingleOrDefault();
+        }
+
+        var likeCount = _dbContext.BinderPageLikes.Count(bpl => bpl.BinderPageId == id);
+        var isLikedByMe = currentProfileId != null &&
+            _dbContext.BinderPageLikes.Any(bpl => bpl.BinderPageId == id && bpl.UserProfileId == currentProfileId);
+
+        return Ok(new
+        {
+            binderPage.Id,
+            binderPage.Title,
+            binderPage.Description,
+            binderPage.Rows,
+            binderPage.Columns,
+            binderPage.CreatedAt,
+            binderPage.BinderPageCardSlots,
+            likeCount,
+            isLikedByMe,
+            isOwnPage = currentProfileId != null && binderPage.UserProfileId == currentProfileId
+        });
+    }
+
     // post /api/binderpage
 
     [HttpPost]
@@ -119,6 +162,7 @@ public class BinderPageController : ControllerBase
 
         binderPage.Title = dto.Title;
         binderPage.Description = dto.Description;
+        binderPage.IsPublic = dto.IsPublic;
         _dbContext.SaveChanges();
 
         return NoContent();

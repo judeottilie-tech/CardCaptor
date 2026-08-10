@@ -25,6 +25,7 @@ export default function BinderPageDetail() {
   const [selectedSideboardEntryId, setSelectedSideboardEntryId] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newIsPublic, setNewIsPublic] = useState(false);
   const [justSaved, setJustSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -43,6 +44,7 @@ export default function BinderPageDetail() {
       if (bp) {
         setNewTitle(bp.title);
         setNewDescription(bp.description || "");
+        setNewIsPublic(bp.isPublic);
         setPendingSlots(bp.binderPageCardSlots);
       }
     });
@@ -333,12 +335,14 @@ export default function BinderPageDetail() {
   const handleStartEdit = () => {
     setNewTitle(binderPage.title);
     setNewDescription(binderPage.description || "");
+    setNewIsPublic(binderPage.isPublic);
     setEditing(true);
   };
 
   const handleExitEdit = () => {
     setNewTitle(binderPage.title);
     setNewDescription(binderPage.description || "");
+    setNewIsPublic(binderPage.isPublic);
     setEditing(false);
   };
 
@@ -346,7 +350,11 @@ export default function BinderPageDetail() {
     e.preventDefault();
     setSaving(true);
 
-    updateBinderPage(binderPage.id, { title: newTitle, description: newDescription }).then(() => {
+    updateBinderPage(binderPage.id, {
+      title: newTitle,
+      description: newDescription,
+      isPublic: newIsPublic,
+    }).then(() => {
       setSaving(false);
       setEditing(false);
       loadBinderPage();
@@ -416,6 +424,15 @@ export default function BinderPageDetail() {
                   rows={3}
                   className="text-sm border border-brand-periwinkle/40 rounded px-2 py-1 bg-white text-brand-ink focus:outline-none focus:border-brand-rose resize-none w-full"
                 />
+                <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newIsPublic}
+                    onChange={(e) => setNewIsPublic(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <span>Public (visible on your profile, no login required)</span>
+                </label>
                 <div className="flex justify-end items-center gap-2 mt-2">
                   {justSaved && <span className="text-green-400 text-sm mr-auto">Saved</span>}
                   <button
@@ -460,6 +477,15 @@ export default function BinderPageDetail() {
                 {binderPage.description && (
                   <p className="text-sm text-brand-cream/60 mt-1 pr-8">{binderPage.description}</p>
                 )}
+                <span
+                  className={`inline-block mt-1 text-xs px-2 py-0.5 rounded-full ${
+                    binderPage.isPublic
+                      ? "bg-brand-sky/20 text-brand-sky"
+                      : "bg-white/10 text-brand-cream/50"
+                  }`}
+                >
+                  {binderPage.isPublic ? "Public" : "Private"}
+                </span>
               </>
             )}
           </div>

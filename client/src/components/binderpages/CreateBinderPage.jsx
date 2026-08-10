@@ -8,10 +8,17 @@ export default function CreateBinderPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [layout, setLayout] = useState(LAYOUTS[1]);
+  const [isPublic, setIsPublic] = useState(false);
 
   const handleCreateBinderPage = (event) => {
     event.preventDefault();
-    const newBinderPage = { title, description, rows: layout.rows, columns: layout.columns };
+    const newBinderPage = {
+      title,
+      description,
+      rows: layout.rows,
+      columns: layout.columns,
+      isPublic,
+    };
     createBinderPage(newBinderPage).then((created) => {
       navigate(`/binderpages/${created.id}`);
     });
@@ -65,6 +72,23 @@ export default function CreateBinderPage() {
                 </button>
               ))}
             </div>
+          </div>
+          <div className="mb-4">
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <span>
+                Make this page public
+                <span className="text-brand-cream/50 font-normal">
+                  {" "}
+                  (visible to anyone at your profile, no login required)
+                </span>
+              </span>
+            </label>
           </div>
           <button
             type="submit"
