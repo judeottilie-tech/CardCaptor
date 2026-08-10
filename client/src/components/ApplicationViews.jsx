@@ -62,7 +62,10 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
         }
       />
       <Route path="u/:userName" element={<PublicProfile />} />
-      <Route path="u/:userName/:id" element={<PublicBinderPageView />} />
+      <Route
+        path="u/:userName/:id"
+        element={<PublicBinderPageView loggedInUser={loggedInUser} />}
+      />
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
     </Routes>
   );
