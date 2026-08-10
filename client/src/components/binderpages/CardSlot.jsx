@@ -11,6 +11,7 @@ export default function CardSlot({
   slot,
   onSelect,
   onRemove,
+  onSendToSideboard,
   onPointerDown,
   isDragging,
   isDragOver,
@@ -57,6 +58,28 @@ export default function CardSlot({
             aria-hidden="true"
           >
             <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
+        <button
+          className="absolute bottom-0 left-0 w-7 h-7 rounded-tr-lg bg-black/40 hover:bg-black/60 border-r border-t border-white/30 opacity-70 hover:opacity-100 flex items-center justify-center transition-colors"
+          aria-label={`Send ${slot.card.name} to sideboard`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSendToSideboard();
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v11M7 12l5 5 5-5" />
+            <path d="M5 19h14" />
           </svg>
         </button>
       </div>

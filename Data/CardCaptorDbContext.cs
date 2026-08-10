@@ -11,6 +11,7 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
     public DbSet<BinderPage> BinderPages { get; set; }
     public DbSet<Card> Cards { get; set; }
     public DbSet<BinderPageCardSlot> BinderPageCardSlots { get; set; }
+    public DbSet<SideboardCard> SideboardCards { get; set; }
 
     public CardCaptorDbContext(DbContextOptions<CardCaptorDbContext> context) : base(context)
     {
@@ -25,9 +26,9 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
             UserName = "Administrator",
             Email = "admin@cardcaptor.comx",
-            ConcurrencyStamp = "1ac5ed5e-321b-43a5-b5cf-601f116f2bc8",
-            SecurityStamp = "d0421a93-dfa7-4b35-9b06-c6254a3482cc",
-            PasswordHash = "AQAAAAIAAYagAAAAELeRD5li3MF+nAJ9iMNI/VKQbd5ZG9hmkK4GCTB98QQA5rRUAustisDll7qQJ6r8Gw=="
+            ConcurrencyStamp = "02a7b74f-8791-44ca-a5de-9df186536535",
+            SecurityStamp = "da5dbabd-64d1-459d-afd7-ffaf17478737",
+            PasswordHash = "AQAAAAIAAYagAAAAED0YJuo3oc5NA8508V9DErvgMXDo9tWsE/tk5CM/YSRKFtvtFxLcV9rK/LrgD2lrGg=="
         });
 
         modelBuilder.Entity<UserProfile>().HasData(new UserProfile
