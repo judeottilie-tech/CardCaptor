@@ -3,9 +3,11 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   getBinderPageById,
   updateBinderPage,
+  updateBinderPageLayout,
 } from "../../managers/binderPageManager";
 import { attachCard, removeCard } from "../../managers/binderPageCardSlotManager";
 import { getSideboard, addToSideboard, removeFromSideboard } from "../../managers/sideboardManager";
+import { LAYOUTS } from "../../data/binderPageLayouts";
 import CardSlot from "./CardSlot";
 import CardPicker from "./CardPicker";
 import Sideboard from "./Sideboard";
@@ -32,6 +34,8 @@ export default function BinderPageDetail() {
   const [dragOverSlotId, setDragOverSlotId] = useState(null);
   const [draggedSideboardEntryId, setDraggedSideboardEntryId] = useState(null);
   const [dragOverSideboard, setDragOverSideboard] = useState(false);
+  const [changingLayout, setChangingLayout] = useState(false);
+  const [layoutSaving, setLayoutSaving] = useState(false);
 
   const loadBinderPage = (signal) => {
     return getBinderPageById(id, signal).then((bp) => {
@@ -299,6 +303,33 @@ export default function BinderPageDetail() {
     });
   };
 
+  const handleChangeLayout = (option) => {
+    const newSlotCount = option.rows * option.columns;
+    const displacedCards = pendingSlots.filter(
+      (slot) => slot.position > newSlotCount && slot.cardId,
+    ).length;
+
+    if (newSlotCount < pendingSlots.length) {
+      const message =
+        displacedCards > 0
+          ? `Switching to ${option.label} will move ${displacedCards} card${
+              displacedCards === 1 ? "" : "s"
+            } from the removed slots to your sideboard. Continue?`
+          : `Switching to ${option.label} will remove ${
+              pendingSlots.length - newSlotCount
+            } empty slot(s). Continue?`;
+      if (!window.confirm(message)) return;
+    }
+
+    setLayoutSaving(true);
+    updateBinderPageLayout(binderPage.id, { rows: option.rows, columns: option.columns }).then(() => {
+      setLayoutSaving(false);
+      setChangingLayout(false);
+      loadBinderPage();
+      loadSideboard();
+    });
+  };
+
   const handleStartEdit = () => {
     setNewTitle(binderPage.title);
     setNewDescription(binderPage.description || "");
@@ -438,7 +469,51 @@ export default function BinderPageDetail() {
         className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto lg:mx-0"
         style={{ width: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
       >
-        <div className="grid grid-cols-3 gap-1">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs text-brand-cream/60">
+            Layout: {binderPage.rows} × {binderPage.columns}
+          </span>
+          {changingLayout ? (
+            <div className="flex flex-wrap gap-1 justify-end">
+              {LAYOUTS.map((option) => (
+                <button
+                  key={option.label}
+                  type="button"
+                  disabled={layoutSaving}
+                  onClick={() => handleChangeLayout(option)}
+                  className={`px-2 py-1 rounded border text-xs font-semibold disabled:opacity-50 ${
+                    binderPage.rows === option.rows && binderPage.columns === option.columns
+                      ? "border-brand-rose bg-brand-rose/20"
+                      : "border-brand-periwinkle/40 hover:bg-brand-blush/10"
+                  }`}
+                >
+                  {option.rows}×{option.columns}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setChangingLayout(false)}
+                className="px-2 py-1 rounded border border-brand-periwinkle/40 text-xs hover:bg-brand-blush/10"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              disabled={slotsDirty}
+              onClick={() => setChangingLayout(true)}
+              title={slotsDirty ? "Save or cancel your card changes first" : undefined}
+              className="text-xs underline decoration-brand-periwinkle/50 hover:text-brand-sky disabled:opacity-40 disabled:no-underline disabled:cursor-not-allowed"
+            >
+              Change Layout
+            </button>
+          )}
+        </div>
+        <div
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${binderPage.columns}, minmax(0, 1fr))` }}
+        >
           {sortedSlots.map((slot) => (
             <CardSlot
               key={slot.id}
