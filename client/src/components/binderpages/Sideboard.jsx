@@ -1,24 +1,34 @@
-export default function Sideboard({ entries, selectedEntryId, onSelectEntry, onDiscardEntry }) {
+export default function Sideboard({
+  entries,
+  selectedEntryId,
+  onSelectEntry,
+  onDiscardEntry,
+  onEntryPointerDown,
+  draggedEntryId,
+}) {
   if (entries.length === 0) {
     return (
-      <p className="text-sm text-brand-cream/50 text-center py-2">
-        Your sideboard is empty. Send a card here from a filled slot to set it aside.
+      <p className="text-sm text-brand-cream/50 text-center py-2 h-full flex items-center justify-center">
+        Your sideboard is empty. Drag a card here from a filled slot to set it aside.
       </p>
     );
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-3 gap-1.5 content-start h-full overflow-hidden">
       {entries.map((entry) => (
         <div
           key={entry.id}
-          className={`relative shrink-0 w-16 aspect-[5/7] cursor-pointer border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-colors ${
+          data-sideboard-id={entry.id}
+          className={`relative min-w-0 min-h-0 aspect-[5/7] cursor-grab active:cursor-grabbing border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-opacity ${
             selectedEntryId === entry.id
               ? "border-2 border-brand-rose bg-brand-blush/30"
               : "border-brand-periwinkle/30"
-          }`}
+          } ${draggedEntryId === entry.id ? "opacity-40" : ""}`}
+          style={{ touchAction: "none" }}
           role="button"
           tabIndex={0}
+          onPointerDown={onEntryPointerDown(entry)}
           onClick={() => onSelectEntry(entry.id)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -26,7 +36,7 @@ export default function Sideboard({ entries, selectedEntryId, onSelectEntry, onD
               onSelectEntry(entry.id);
             }
           }}
-          aria-label={`${entry.card.name} in sideboard. Press Enter to select, then choose an empty slot to place it.`}
+          aria-label={`${entry.card.name} in sideboard. Press Enter to select, then choose an empty slot to place it, or drag it onto a slot.`}
         >
           <img
             src={entry.card.imageUrl}
