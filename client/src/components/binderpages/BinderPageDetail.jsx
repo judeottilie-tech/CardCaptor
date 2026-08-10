@@ -30,6 +30,8 @@ export default function BinderPageDetail() {
   const [slotsJustSaved, setSlotsJustSaved] = useState(false);
   const [draggedSlotId, setDraggedSlotId] = useState(null);
   const [dragOverSlotId, setDragOverSlotId] = useState(null);
+  const [draggedSideboardEntryId, setDraggedSideboardEntryId] = useState(null);
+  const [dragOverSideboard, setDragOverSideboard] = useState(false);
 
   const loadBinderPage = (signal) => {
     return getBinderPageById(id, signal).then((bp) => {
@@ -93,7 +95,14 @@ export default function BinderPageDetail() {
     if (selectedSideboardEntryId === entry.id) setSelectedSideboardEntryId(null);
   };
 
-  const dragStateRef = useRef({ startX: 0, startY: 0, sourceId: null, dragging: false, overId: null });
+  const dragStateRef = useRef({
+    startX: 0,
+    startY: 0,
+    source: null,
+    dragging: false,
+    overSlotId: null,
+    overSideboard: false,
+  });
   const suppressClickRef = useRef(false);
 
   const handleSelectSlot = (slotId) => {
@@ -143,35 +152,69 @@ export default function BinderPageDetail() {
 
   const handleSlotPointerDown = (slotId) => (e) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
-    dragStateRef.current = { startX: e.clientX, startY: e.clientY, sourceId: slotId, dragging: false, overId: null };
+    dragStateRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      source: { type: "slot", id: slotId },
+      dragging: false,
+      overSlotId: null,
+      overSideboard: false,
+    };
+  };
+
+  const handleSideboardEntryPointerDown = (entry) => (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragStateRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      source: { type: "sideboard", entry },
+      dragging: false,
+      overSlotId: null,
+      overSideboard: false,
+    };
   };
 
   // Native HTML5 drag-and-drop (draggable/dragstart/drop) never fires on
-  // touch devices at all, so slot reordering is built on Pointer Events
-  // instead - they fire uniformly for mouse and touch. A small movement
-  // threshold distinguishes an actual drag from a tap that should just
-  // open the card picker.
+  // touch devices at all, so slot reordering (and sideboard placement) is
+  // built on Pointer Events instead - they fire uniformly for mouse and
+  // touch. A small movement threshold distinguishes an actual drag from a
+  // tap that should just open the card picker or select a sideboard entry.
+  // The effect depends on pendingSlots so the drop-target checks below
+  // always see the current slot state, not a stale first-render snapshot.
   useEffect(() => {
     const DRAG_THRESHOLD = 10;
 
+    const readTarget = (x, y) => {
+      const el = document.elementFromPoint(x, y);
+      const slotEl = el?.closest("[data-slot-id]");
+      const sideboardEl = el?.closest("[data-sideboard-dropzone]");
+      return {
+        slotId: slotEl ? Number(slotEl.dataset.slotId) : null,
+        overSideboard: !!sideboardEl,
+      };
+    };
+
     const handlePointerMove = (e) => {
       const state = dragStateRef.current;
-      if (!state.sourceId) return;
+      if (!state.source) return;
 
       if (!state.dragging) {
         const dx = e.clientX - state.startX;
         const dy = e.clientY - state.startY;
         if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
         state.dragging = true;
-        setDraggedSlotId(state.sourceId);
+        if (state.source.type === "slot") setDraggedSlotId(state.source.id);
+        else setDraggedSideboardEntryId(state.source.entry.id);
       }
 
-      const el = document.elementFromPoint(e.clientX, e.clientY);
-      const targetEl = el?.closest("[data-slot-id]");
-      const targetId = targetEl ? Number(targetEl.dataset.slotId) : null;
-      if (targetId !== state.overId) {
-        state.overId = targetId;
-        setDragOverSlotId(targetId);
+      const { slotId, overSideboard } = readTarget(e.clientX, e.clientY);
+      if (slotId !== state.overSlotId) {
+        state.overSlotId = slotId;
+        setDragOverSlotId(slotId);
+      }
+      if (overSideboard !== state.overSideboard) {
+        state.overSideboard = overSideboard;
+        setDragOverSideboard(overSideboard);
       }
     };
 
@@ -184,20 +227,41 @@ export default function BinderPageDetail() {
         }, 0);
 
         // Determine the drop target fresh from the release position rather
-        // than trusting state.overId - on a longer/faster drag the browser
-        // can coalesce pointermove events, so the incrementally-tracked
+        // than trusting the incrementally-tracked state - on a longer/faster
+        // drag the browser can coalesce pointermove events, so the tracked
         // target can lag behind or miss the actual final position entirely.
-        const el = document.elementFromPoint(e.clientX, e.clientY);
-        const targetEl = el?.closest("[data-slot-id]");
-        const finalTargetId = targetEl ? Number(targetEl.dataset.slotId) : null;
+        const { slotId: finalSlotId, overSideboard: finalOverSideboard } = readTarget(
+          e.clientX,
+          e.clientY,
+        );
 
-        if (state.sourceId && finalTargetId && finalTargetId !== state.sourceId) {
-          swapSlots(state.sourceId, finalTargetId);
+        if (state.source.type === "slot") {
+          if (finalSlotId && finalSlotId !== state.source.id) {
+            swapSlots(state.source.id, finalSlotId);
+          } else if (finalOverSideboard) {
+            handleSendToSideboard(state.source.id);
+          }
+        } else if (state.source.type === "sideboard") {
+          if (finalSlotId) {
+            const targetSlot = pendingSlots.find((s) => s.id === finalSlotId);
+            if (targetSlot && !targetSlot.cardId) {
+              handlePlaceFromSideboard(finalSlotId, state.source.entry);
+            }
+          }
         }
       }
-      dragStateRef.current = { startX: 0, startY: 0, sourceId: null, dragging: false, overId: null };
+      dragStateRef.current = {
+        startX: 0,
+        startY: 0,
+        source: null,
+        dragging: false,
+        overSlotId: null,
+        overSideboard: false,
+      };
       setDraggedSlotId(null);
       setDragOverSlotId(null);
+      setDraggedSideboardEntryId(null);
+      setDragOverSideboard(false);
     };
 
     window.addEventListener("pointermove", handlePointerMove);
@@ -208,7 +272,7 @@ export default function BinderPageDetail() {
       window.removeEventListener("pointerup", handlePointerUp);
       window.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, []);
+  }, [pendingSlots]);
 
   const goToDashboard = () => navigate("/");
 
@@ -296,10 +360,12 @@ export default function BinderPageDetail() {
         <span aria-hidden="true">&larr;</span> Back to Dashboard
       </button>
 
-      <div className="mx-auto px-4 max-w-2xl">
+      <div className="mx-auto px-4 max-w-2xl lg:max-w-none lg:w-fit">
+      <div className="lg:flex lg:items-start lg:gap-4">
+      <div className="lg:shrink-0">
       <div
-        className="bg-white/5 rounded-2xl p-3 sm:p-4 mb-3 mx-auto"
-        style={{ maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
+        className="bg-white/5 rounded-2xl p-3 sm:p-4 mb-3 mx-auto lg:mx-0"
+        style={{ width: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
       >
         <div className="relative min-w-0 border border-brand-periwinkle/30 rounded-xl p-2 sm:p-3">
           {editing ? (
@@ -369,8 +435,8 @@ export default function BinderPageDetail() {
       </div>
 
       <div
-        className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto"
-        style={{ maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
+        className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto lg:mx-0"
+        style={{ width: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
       >
         <div className="grid grid-cols-3 gap-1">
           {sortedSlots.map((slot) => (
@@ -411,25 +477,37 @@ export default function BinderPageDetail() {
           </button>
         </div>
       </div>
+      </div>
 
       <div
-        className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto mt-3"
-        style={{ maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
+        data-sideboard-dropzone
+        className={`bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto mt-3 lg:mt-0 lg:w-52 lg:shrink-0 flex flex-col transition-colors ${
+          dragOverSideboard ? "ring-2 ring-brand-rose bg-brand-blush/10" : ""
+        }`}
+        style={{
+          maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)",
+          height: "clamp(200px, calc((100vh - 260px) / 1.1), 28rem)",
+        }}
       >
-        <h2 className="font-heading text-sm font-bold mb-2">Sideboard</h2>
+        <h2 className="font-heading text-sm font-bold mb-2 shrink-0">Sideboard</h2>
         {selectedSideboardEntryId && (
-          <p className="text-xs text-brand-sky mb-2">
-            Card selected — tap an empty slot to place it.
+          <p className="text-xs text-brand-sky mb-2 shrink-0">
+            Card selected — tap an empty slot to place it, or drag any card directly.
           </p>
         )}
-        <Sideboard
-          entries={sideboardEntries}
-          selectedEntryId={selectedSideboardEntryId}
-          onSelectEntry={(entryId) =>
-            setSelectedSideboardEntryId((current) => (current === entryId ? null : entryId))
-          }
-          onDiscardEntry={handleDiscardSideboardEntry}
-        />
+        <div className="flex-1 min-h-0">
+          <Sideboard
+            entries={sideboardEntries}
+            selectedEntryId={selectedSideboardEntryId}
+            onSelectEntry={(entryId) =>
+              setSelectedSideboardEntryId((current) => (current === entryId ? null : entryId))
+            }
+            onDiscardEntry={handleDiscardSideboardEntry}
+            onEntryPointerDown={handleSideboardEntryPointerDown}
+            draggedEntryId={draggedSideboardEntryId}
+          />
+        </div>
+      </div>
       </div>
       </div>
 

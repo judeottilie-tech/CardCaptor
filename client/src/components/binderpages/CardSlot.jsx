@@ -19,7 +19,7 @@ export default function CardSlot({
   if (slot.card) {
     return (
       <div
-        className={`relative aspect-[5/7] cursor-grab active:cursor-grabbing border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-opacity ${
+        className={`relative min-w-0 min-h-0 aspect-[5/7] cursor-grab active:cursor-grabbing border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-opacity ${
           isDragOver
             ? "border-2 border-brand-rose bg-brand-blush/30"
             : "border-brand-periwinkle/30"
@@ -88,7 +88,7 @@ export default function CardSlot({
 
   return (
     <div
-      className={`aspect-[5/7] border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle focus-visible:ring-2 focus-visible:ring-brand-rose ${
+      className={`min-w-0 min-h-0 aspect-[5/7] border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle focus-visible:ring-2 focus-visible:ring-brand-rose ${
         isDragOver ? "border-brand-rose bg-brand-blush/30" : "border-brand-periwinkle/40"
       }`}
       role="button"
