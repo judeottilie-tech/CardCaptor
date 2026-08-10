@@ -125,7 +125,6 @@ public class BinderPageController : ControllerBase
           Description = dto.Description,
           Rows = dto.Rows,
           Columns = dto.Columns,
-          IsPublic = dto.IsPublic,
           UserProfileId = profile.Id,
           CreatedAt = DateTime.UtcNow
         };
