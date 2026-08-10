@@ -72,6 +72,7 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             CreatedAt = new DateTime(2026, 7, 23),
             Rows = 3,
             Columns = 3,
+            IsPublic = false,
             UserProfileId = 2
         });
 

@@ -62,6 +62,22 @@ public class BinderPageController : ControllerBase
         return Ok(binderPage);
     }
 
+    //get /api/binderpage/{id}/public
+
+    [HttpGet("{id}/public")]
+    [AllowAnonymous]
+    public IActionResult GetPublic(int id)
+    {
+        var binderPage = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+                .ThenInclude(bpcs => bpcs.Card)
+            .SingleOrDefault(bp => bp.Id == id);
+
+        if (binderPage == null) return NotFound();
+        if (!binderPage.IsPublic) return NotFound();
+        return Ok(binderPage);
+    }
+
     // post /api/binderpage
 
     [HttpPost]
@@ -82,6 +98,7 @@ public class BinderPageController : ControllerBase
           Description = dto.Description,
           Rows = dto.Rows,
           Columns = dto.Columns,
+          IsPublic = dto.IsPublic,
           UserProfileId = profile.Id,
           CreatedAt = DateTime.UtcNow
         };
@@ -119,6 +136,7 @@ public class BinderPageController : ControllerBase
 
         binderPage.Title = dto.Title;
         binderPage.Description = dto.Description;
+        binderPage.IsPublic = dto.IsPublic;
         _dbContext.SaveChanges();
 
         return NoContent();

@@ -33,6 +33,13 @@ export const updateBinderPage = (id, binderPage) => {
   });
 };
 
+export const getPublicBinderPage = (id, signal) => {
+  return fetch(`${_apiUrl}/${id}/public`, { credentials: "include", signal }).then((res) => {
+    if (!res.ok) return null;
+    return res.json();
+  });
+};
+
 export const updateBinderPageLayout = (id, layout) => {
   return fetch(`${_apiUrl}/${id}/layout`, {
     method: "PUT",
