@@ -70,6 +70,8 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             Id = 1,
             Title = "Demo Binder",
             CreatedAt = new DateTime(2026, 7, 23),
+            Rows = 3,
+            Columns = 3,
             UserProfileId = 2
         });
 
