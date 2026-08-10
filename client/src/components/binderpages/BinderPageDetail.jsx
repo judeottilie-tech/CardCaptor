@@ -5,8 +5,10 @@ import {
   updateBinderPage,
 } from "../../managers/binderPageManager";
 import { attachCard, removeCard } from "../../managers/binderPageCardSlotManager";
+import { getSideboard, addToSideboard, removeFromSideboard } from "../../managers/sideboardManager";
 import CardSlot from "./CardSlot";
 import CardPicker from "./CardPicker";
+import Sideboard from "./Sideboard";
 
 export default function BinderPageDetail() {
   const { id } = useParams();
@@ -15,6 +17,10 @@ export default function BinderPageDetail() {
   const [binderPage, setBinderPage] = useState();
   const [pendingSlots, setPendingSlots] = useState([]);
   const [selectedSlotId, setSelectedSlotId] = useState(null);
+  const [sideboard, setSideboard] = useState([]);
+  const [pendingSideboardAdds, setPendingSideboardAdds] = useState([]);
+  const [pendingSideboardRemovals, setPendingSideboardRemovals] = useState([]);
+  const [selectedSideboardEntryId, setSelectedSideboardEntryId] = useState(null);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
   const [justSaved, setJustSaved] = useState(false);
@@ -36,19 +42,72 @@ export default function BinderPageDetail() {
     });
   };
 
+  const loadSideboard = () => getSideboard().then(setSideboard);
+
   useEffect(() => {
     const controller = new AbortController();
     loadBinderPage(controller.signal).catch((err) => {
       if (err.name !== "AbortError") throw err;
     });
+    loadSideboard();
     return () => controller.abort();
   }, [id]);
+
+  const sideboardEntries = [
+    ...sideboard
+      .filter((sc) => !pendingSideboardRemovals.includes(sc.id))
+      .map((sc) => ({ id: sc.id, card: sc.card, isPending: false })),
+    ...pendingSideboardAdds.map((a) => ({ id: a.tempId, card: a.card, isPending: true })),
+  ];
+
+  const handleSendToSideboard = (slotId) => {
+    const slot = pendingSlots.find((s) => s.id === slotId);
+    if (!slot?.card) return;
+    setPendingSideboardAdds((adds) => [
+      ...adds,
+      { tempId: `pending-${Date.now()}-${slot.card.id}`, card: slot.card },
+    ]);
+    setPendingSlots((slots) =>
+      slots.map((s) => (s.id === slotId ? { ...s, cardId: null, card: null } : s)),
+    );
+  };
+
+  const handlePlaceFromSideboard = (slotId, entry) => {
+    setPendingSlots((slots) =>
+      slots.map((s) => (s.id === slotId ? { ...s, cardId: entry.card.id, card: entry.card } : s)),
+    );
+    if (entry.isPending) {
+      setPendingSideboardAdds((adds) => adds.filter((a) => a.tempId !== entry.id));
+    } else {
+      setPendingSideboardRemovals((removals) => [...removals, entry.id]);
+    }
+    setSelectedSideboardEntryId(null);
+  };
+
+  const handleDiscardSideboardEntry = (entry) => {
+    if (entry.isPending) {
+      setPendingSideboardAdds((adds) => adds.filter((a) => a.tempId !== entry.id));
+    } else {
+      removeFromSideboard(entry.id).then(loadSideboard);
+    }
+    if (selectedSideboardEntryId === entry.id) setSelectedSideboardEntryId(null);
+  };
 
   const dragStateRef = useRef({ startX: 0, startY: 0, sourceId: null, dragging: false, overId: null });
   const suppressClickRef = useRef(false);
 
   const handleSelectSlot = (slotId) => {
     if (suppressClickRef.current) return;
+
+    const slot = pendingSlots.find((s) => s.id === slotId);
+    if (selectedSideboardEntryId && slot && !slot.cardId) {
+      const entry = sideboardEntries.find((e) => e.id === selectedSideboardEntryId);
+      if (entry) {
+        handlePlaceFromSideboard(slotId, entry);
+        return;
+      }
+    }
+
     setSelectedSlotId(slotId);
   };
 
@@ -162,9 +221,15 @@ export default function BinderPageDetail() {
       })
       .map((slot) => (slot.cardId ? attachCard(slot.id, slot.cardId) : removeCard(slot.id)));
 
-    Promise.all(slotUpdates).then(() => {
+    const sideboardAddCalls = pendingSideboardAdds.map((a) => addToSideboard(a.card.id));
+    const sideboardRemoveCalls = pendingSideboardRemovals.map((entryId) => removeFromSideboard(entryId));
+
+    Promise.all([...slotUpdates, ...sideboardAddCalls, ...sideboardRemoveCalls]).then(() => {
       setSlotsSaving(false);
       loadBinderPage();
+      loadSideboard();
+      setPendingSideboardAdds([]);
+      setPendingSideboardRemovals([]);
       setSlotsJustSaved(true);
       setTimeout(() => setSlotsJustSaved(false), 1500);
     });
@@ -213,10 +278,13 @@ export default function BinderPageDetail() {
   }
 
   const sortedSlots = [...pendingSlots].sort((a, b) => a.position - b.position);
-  const slotsDirty = pendingSlots.some((slot) => {
-    const original = binderPage.binderPageCardSlots.find((s) => s.id === slot.id);
-    return original.cardId !== slot.cardId;
-  });
+  const slotsDirty =
+    pendingSlots.some((slot) => {
+      const original = binderPage.binderPageCardSlots.find((s) => s.id === slot.id);
+      return original.cardId !== slot.cardId;
+    }) ||
+    pendingSideboardAdds.length > 0 ||
+    pendingSideboardRemovals.length > 0;
 
   return (
     <div className="relative mt-2 sm:mt-4">
@@ -311,6 +379,7 @@ export default function BinderPageDetail() {
               slot={slot}
               onSelect={() => handleSelectSlot(slot.id)}
               onRemove={() => handleRemoveCard(slot.id)}
+              onSendToSideboard={() => handleSendToSideboard(slot.id)}
               onPointerDown={slot.card ? handleSlotPointerDown(slot.id) : undefined}
               isDragging={draggedSlotId === slot.id}
               isDragOver={dragOverSlotId === slot.id && draggedSlotId !== slot.id}
@@ -341,6 +410,26 @@ export default function BinderPageDetail() {
             {slotsSaving ? "Saving..." : "Save"}
           </button>
         </div>
+      </div>
+
+      <div
+        className="bg-white/5 rounded-2xl p-4 sm:p-6 mx-auto mt-3"
+        style={{ maxWidth: "clamp(240px, calc((100vh - 260px) / 1.35), 38rem)" }}
+      >
+        <h2 className="font-heading text-sm font-bold mb-2">Sideboard</h2>
+        {selectedSideboardEntryId && (
+          <p className="text-xs text-brand-sky mb-2">
+            Card selected — tap an empty slot to place it.
+          </p>
+        )}
+        <Sideboard
+          entries={sideboardEntries}
+          selectedEntryId={selectedSideboardEntryId}
+          onSelectEntry={(entryId) =>
+            setSelectedSideboardEntryId((current) => (current === entryId ? null : entryId))
+          }
+          onDiscardEntry={handleDiscardSideboardEntry}
+        />
       </div>
       </div>
 
