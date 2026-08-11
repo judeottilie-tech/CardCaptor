@@ -1,9 +1,6 @@
 namespace CardCaptor.Data;
 
 public record PokemonLine(string Stage1, string Stage2, string Stage3);
-
-// Static reference data: the 27 starter lines a user can pick from at registration,
-// each with its 2 evolutions. Feed-count thresholds control when the pet evolves.
 public static class PokemonStarters
 {
     public const int Stage2FeedThreshold = 10;

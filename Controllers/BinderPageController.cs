@@ -165,9 +165,6 @@ public class BinderPageController : ControllerBase
 
         var newSlotCount = dto.Rows * dto.Columns;
 
-        // Shrinking: any slot beyond the new capacity is removed. A card sitting
-        // in one of those slots isn't deleted - it moves to the sideboard so the
-        // resize never silently loses a placed card.
         var slotsToRemove = binderPage.BinderPageCardSlots
             .Where(slot => slot.Position > newSlotCount)
             .ToList();
@@ -186,7 +183,6 @@ public class BinderPageController : ControllerBase
         }
         _dbContext.BinderPageCardSlots.RemoveRange(slotsToRemove);
 
-        // Growing: add empty slots to fill out the new capacity.
         var currentSlotCount = binderPage.BinderPageCardSlots.Count;
         for (int position = currentSlotCount + 1; position <= newSlotCount; position++)
         {

@@ -9,7 +9,7 @@ export default function Sideboard({
   if (entries.length === 0) {
     return (
       <p className="text-sm text-brand-cream/50 text-center py-2 h-full flex items-center justify-center">
-        Your sideboard is empty. Drag a card here from a filled slot to set it aside.
+        Your sideboard is empty. Drag a card here to set it aside.
       </p>
     );
   }
