@@ -50,7 +50,7 @@ export default function BinderPageDetail() {
     });
   };
 
-  const loadSideboard = () => getSideboard().then(setSideboard);
+  const loadSideboard = () => getSideboard(id).then(setSideboard);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -291,7 +291,7 @@ export default function BinderPageDetail() {
       })
       .map((slot) => (slot.cardId ? attachCard(slot.id, slot.cardId) : removeCard(slot.id)));
 
-    const sideboardAddCalls = pendingSideboardAdds.map((a) => addToSideboard(a.card.id));
+    const sideboardAddCalls = pendingSideboardAdds.map((a) => addToSideboard(a.card.id, binderPage.id));
     const sideboardRemoveCalls = pendingSideboardRemovals.map((entryId) => removeFromSideboard(entryId));
 
     Promise.all([...slotUpdates, ...sideboardAddCalls, ...sideboardRemoveCalls]).then(() => {

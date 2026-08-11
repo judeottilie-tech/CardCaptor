@@ -75,7 +75,34 @@ public class BinderPageController : ControllerBase
 
         if (binderPage == null) return NotFound();
         if (!binderPage.IsPublic) return NotFound();
-        return Ok(binderPage);
+
+        int? currentProfileId = null;
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (identityUserId != null)
+        {
+            currentProfileId = _dbContext.UserProfiles
+                .Where(up => up.IdentityUserId == identityUserId)
+                .Select(up => (int?)up.Id)
+                .SingleOrDefault();
+        }
+
+        var likeCount = _dbContext.BinderPageLikes.Count(bpl => bpl.BinderPageId == id);
+        var isLikedByMe = currentProfileId != null &&
+            _dbContext.BinderPageLikes.Any(bpl => bpl.BinderPageId == id && bpl.UserProfileId == currentProfileId);
+
+        return Ok(new
+        {
+            binderPage.Id,
+            binderPage.Title,
+            binderPage.Description,
+            binderPage.Rows,
+            binderPage.Columns,
+            binderPage.CreatedAt,
+            binderPage.BinderPageCardSlots,
+            likeCount,
+            isLikedByMe,
+            isOwnPage = currentProfileId != null && binderPage.UserProfileId == currentProfileId
+        });
     }
 
     // post /api/binderpage
@@ -178,7 +205,7 @@ public class BinderPageController : ControllerBase
             {
                 _dbContext.SideboardCards.Add(new SideboardCard
                 {
-                    UserProfileId = profile.Id,
+                    BinderPageId = binderPage.Id,
                     CardId = slot.CardId.Value,
                     AddedAt = DateTime.UtcNow
                 });

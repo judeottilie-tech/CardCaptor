@@ -7,7 +7,6 @@ public static class BinderPageLayouts
         (2, 2),
         (3, 3),
         (3, 4),
-        (4, 4),
     };
 
     public static bool IsValid(int rows, int columns) =>

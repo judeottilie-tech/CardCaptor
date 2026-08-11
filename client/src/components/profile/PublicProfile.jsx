@@ -42,23 +42,47 @@ export default function PublicProfile() {
 
       <h2 className="font-heading text-lg font-bold mb-3">Public Binder Pages</h2>
       {profile.binderPages.length === 0 ? (
-        <p className="text-brand-cream/60">This user hasn't made any binder pages public yet.</p>
+        <p className="text-brand-cream/60 mb-6">This user hasn't made any binder pages public yet.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2 mb-6">
           {profile.binderPages.map((bp) => (
             <li key={bp.id}>
               <Link
                 to={`/u/${profile.userName}/${bp.id}`}
-                className="block bg-white/5 hover:bg-white/10 rounded-xl p-4 transition-colors"
+                className="flex items-center justify-between gap-3 bg-white/5 hover:bg-white/10 rounded-xl p-4 transition-colors"
               >
-                <p className="font-semibold">{bp.title}</p>
-                {bp.description && (
-                  <p className="text-sm text-brand-cream/60 truncate">{bp.description}</p>
-                )}
+                <div className="min-w-0">
+                  <p className="font-semibold">{bp.title}</p>
+                  {bp.description && (
+                    <p className="text-sm text-brand-cream/60 truncate">{bp.description}</p>
+                  )}
+                </div>
+                <span className="shrink-0 text-sm text-brand-cream/50">
+                  <span aria-hidden="true">♡</span> {bp.likeCount}
+                </span>
               </Link>
             </li>
           ))}
         </ul>
+      )}
+
+      {profile.likedPages.length > 0 && (
+        <>
+          <h2 className="font-heading text-lg font-bold mb-3">Liked Pages</h2>
+          <ul className="flex flex-col gap-2">
+            {profile.likedPages.map((bp) => (
+              <li key={bp.id}>
+                <Link
+                  to={`/u/${bp.ownerUserName}/${bp.id}`}
+                  className="block bg-white/5 hover:bg-white/10 rounded-xl p-4 transition-colors"
+                >
+                  <p className="font-semibold">{bp.title}</p>
+                  <p className="text-sm text-brand-cream/60">by {bp.ownerDisplayName}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );
