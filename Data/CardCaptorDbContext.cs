@@ -81,11 +81,6 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             UserProfileId = 2
         });
 
-        // All 9 slots start empty rather than pointing at specific Card ids:
-        // the old hand-seeded 50-card catalog these used to reference (Charizard=4,
-        // Venusaur=15, Blastoise=2, Mewtwo=10) no longer exists on this schema -
-        // cards now come from the live TCGdex import (CardImportService), which
-        // assigns its own ids at import time, not at migration-definition time.
         modelBuilder.Entity<BinderPageCardSlot>().HasData(new BinderPageCardSlot[]
         {
             new BinderPageCardSlot { Id = 1, Position = 1, BinderPageId = 1, CardId = null },

@@ -47,7 +47,10 @@ export default function NavBar({ loggedInUser, setLoggedInUser, pet }) {
         aria-hidden="true"
       />
       <div className="flex items-center justify-between">
-        <NavLink to="/" className="font-heading text-lg font-bold hover:text-brand-blush">
+        <NavLink
+          to="/"
+          className="font-heading text-lg font-bold hover:text-brand-blush"
+        >
           CardCaptor
         </NavLink>
 
@@ -78,10 +81,19 @@ export default function NavBar({ loggedInUser, setLoggedInUser, pet }) {
                       className="h-10 w-10 rounded-full object-cover shrink-0"
                     />
                   )}
-                  <p className="font-semibold truncate">{loggedInUser.displayName}</p>
+                  <p className="font-semibold truncate">
+                    {loggedInUser.displayName}
+                  </p>
                 </div>
 
                 <div className="py-1">
+                  <NavLink
+                    to={`/u/${loggedInUser.userName}`}
+                    className={menuLinkClass}
+                    onClick={closeMenu}
+                  >
+                    My Public Profile
+                  </NavLink>
                   <NavLink to="/" className={menuLinkClass} onClick={closeMenu}>
                     My Binder Pages
                   </NavLink>
@@ -91,13 +103,6 @@ export default function NavBar({ loggedInUser, setLoggedInUser, pet }) {
                     onClick={closeMenu}
                   >
                     New Binder Page
-                  </NavLink>
-                  <NavLink
-                    to={`/u/${loggedInUser.userName}`}
-                    className={menuLinkClass}
-                    onClick={closeMenu}
-                  >
-                    My Public Profile
                   </NavLink>
                 </div>
 
