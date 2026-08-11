@@ -37,7 +37,23 @@ public class ProfileController : ControllerBase
                 bp.Description,
                 bp.Rows,
                 bp.Columns,
-                bp.CreatedAt
+                bp.CreatedAt,
+                likeCount = _dbContext.BinderPageLikes.Count(bpl => bpl.BinderPageId == bp.Id)
+            })
+            .ToList();
+
+        // Only pages that are still public today should show up here - if the
+        // owner has since made a liked page private, showing it would leak its
+        // title/existence through someone else's profile.
+        var likedPages = _dbContext.BinderPageLikes
+            .Where(bpl => bpl.UserProfileId == profile.Id && bpl.BinderPage.IsPublic)
+            .Select(bpl => new
+            {
+                bpl.BinderPage.Id,
+                bpl.BinderPage.Title,
+                bpl.BinderPage.Description,
+                ownerUserName = bpl.BinderPage.UserProfile.IdentityUser.UserName,
+                ownerDisplayName = bpl.BinderPage.UserProfile.DisplayName
             })
             .ToList();
 
@@ -47,7 +63,8 @@ public class ProfileController : ControllerBase
             userName = user.UserName,
             currentPokemon = PokemonStarters.GetCurrentStagePokemon(profile.StarterPokemon, profile.PetFeedCount),
             stage = PokemonStarters.GetStage(profile.PetFeedCount),
-            binderPages = publicBinderPages
+            binderPages = publicBinderPages,
+            likedPages
         });
     }
 }
