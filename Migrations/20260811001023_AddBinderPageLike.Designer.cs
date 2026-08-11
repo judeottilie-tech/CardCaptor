@@ -3,6 +3,7 @@ using System;
 using CardCaptor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CardCaptor.Migrations
 {
     [DbContext(typeof(CardCaptorDbContext))]
-    partial class CardCaptorDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260811001023_AddBinderPageLike")]
+    partial class AddBinderPageLike
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,17 +242,17 @@ namespace CardCaptor.Migrations
                     b.Property<DateTime>("AddedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int>("BinderPageId")
+                    b.Property<int>("CardId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("CardId")
+                    b.Property<int>("UserProfileId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BinderPageId");
-
                     b.HasIndex("CardId");
+
+                    b.HasIndex("UserProfileId");
 
                     b.ToTable("SideboardCards");
                 });
@@ -587,21 +590,21 @@ namespace CardCaptor.Migrations
 
             modelBuilder.Entity("CardCaptor.Models.SideboardCard", b =>
                 {
-                    b.HasOne("CardCaptor.Models.BinderPage", "BinderPage")
-                        .WithMany()
-                        .HasForeignKey("BinderPageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("CardCaptor.Models.Card", "Card")
                         .WithMany()
                         .HasForeignKey("CardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BinderPage");
+                    b.HasOne("CardCaptor.Models.UserProfile", "UserProfile")
+                        .WithMany()
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Card");
+
+                    b.Navigation("UserProfile");
                 });
 
             modelBuilder.Entity("CardCaptor.Models.UserProfile", b =>

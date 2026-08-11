@@ -201,7 +201,7 @@ public class BinderPageController : ControllerBase
             {
                 _dbContext.SideboardCards.Add(new SideboardCard
                 {
-                    UserProfileId = profile.Id,
+                    BinderPageId = binderPage.Id,
                     CardId = slot.CardId.Value,
                     AddedAt = DateTime.UtcNow
                 });

@@ -25,15 +25,19 @@ public class SideboardController : ControllerBase
 
     [HttpGet]
     [Authorize]
-    public IActionResult Get()
+    public IActionResult Get([FromQuery] int binderPageId)
     {
         var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
 
+        var binderPage = _dbContext.BinderPages.SingleOrDefault(bp => bp.Id == binderPageId);
+        if (binderPage == null) return NotFound();
+        if (binderPage.UserProfileId != profile.Id) return NotFound();
+
         var sideboardCards = _dbContext.SideboardCards
             .Include(sc => sc.Card)
-            .Where(sc => sc.UserProfileId == profile.Id)
+            .Where(sc => sc.BinderPageId == binderPageId)
             .ToList();
 
         return Ok(sideboardCards);
@@ -47,9 +51,13 @@ public class SideboardController : ControllerBase
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
 
+        var binderPage = _dbContext.BinderPages.SingleOrDefault(bp => bp.Id == dto.BinderPageId);
+        if (binderPage == null) return NotFound();
+        if (binderPage.UserProfileId != profile.Id) return NotFound();
+
         var sideboardCard = new SideboardCard
         {
-            UserProfileId = profile.Id,
+            BinderPageId = dto.BinderPageId,
             CardId = dto.CardId,
             AddedAt = DateTime.UtcNow
         };
@@ -67,9 +75,11 @@ public class SideboardController : ControllerBase
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
 
-        var sideboardCard = _dbContext.SideboardCards.SingleOrDefault(sc => sc.Id == id);
+        var sideboardCard = _dbContext.SideboardCards
+            .Include(sc => sc.BinderPage)
+            .SingleOrDefault(sc => sc.Id == id);
         if (sideboardCard == null) return NotFound();
-        if (sideboardCard.UserProfileId != profile.Id) return NotFound();
+        if (sideboardCard.BinderPage.UserProfileId != profile.Id) return NotFound();
 
         _dbContext.SideboardCards.Remove(sideboardCard);
         _dbContext.SaveChanges();
