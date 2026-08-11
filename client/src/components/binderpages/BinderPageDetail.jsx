@@ -180,13 +180,6 @@ export default function BinderPageDetail() {
     };
   };
 
-  // Native HTML5 drag-and-drop (draggable/dragstart/drop) never fires on
-  // touch devices at all, so slot reordering (and sideboard placement) is
-  // built on Pointer Events instead - they fire uniformly for mouse and
-  // touch. A small movement threshold distinguishes an actual drag from a
-  // tap that should just open the card picker or select a sideboard entry.
-  // The effect depends on pendingSlots so the drop-target checks below
-  // always see the current slot state, not a stale first-render snapshot.
   useEffect(() => {
     const DRAG_THRESHOLD = 10;
 
@@ -232,10 +225,6 @@ export default function BinderPageDetail() {
           suppressClickRef.current = false;
         }, 0);
 
-        // Determine the drop target fresh from the release position rather
-        // than trusting the incrementally-tracked state - on a longer/faster
-        // drag the browser can coalesce pointermove events, so the tracked
-        // target can lag behind or miss the actual final position entirely.
         const { slotId: finalSlotId, overSideboard: finalOverSideboard } = readTarget(
           e.clientX,
           e.clientY,

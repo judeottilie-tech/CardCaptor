@@ -33,7 +33,7 @@ export default function BinderPageList() {
       </div>
       {binderPages.length === 0 ? (
         <p className="inline-flex items-center gap-1.5 text-brand-cream/60">
-          You don't have any binder pages yet — create one to get started.
+          You don't have any binder pages yet!
         </p>
       ) : (
         <ul className="flex flex-col gap-3">

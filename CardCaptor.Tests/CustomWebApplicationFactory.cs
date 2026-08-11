@@ -10,20 +10,13 @@ using Microsoft.Extensions.Hosting;
 
 namespace CardCaptor.Tests;
 
-// Swaps the real Postgres-backed CardCaptorDbContext for a Sqlite in-memory
-// one so tests exercise the real ASP.NET Identity + cookie-auth pipeline
-// without needing a live Postgres instance.
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // Skips Program.cs's own db.Database.Migrate() call (see the
-        // Environment check there) - several existing migrations embed raw
-        // Postgres-only SQL (e.g. NOW() in AddPetToUserProfile), which has
-        // no Sqlite equivalent. EnsureCreated() below builds schema straight
-        // from the current model instead, sidestepping that entirely.
+ 
         builder.UseEnvironment("Testing");
 
         builder.ConfigureAppConfiguration((_, config) =>
