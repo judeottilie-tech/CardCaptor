@@ -62,6 +62,49 @@ public class BinderPageController : ControllerBase
         return Ok(binderPage);
     }
 
+    //get /api/binderpage/{id}/public
+
+    [HttpGet("{id}/public")]
+    [AllowAnonymous]
+    public IActionResult GetPublic(int id)
+    {
+        var binderPage = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+                .ThenInclude(bpcs => bpcs.Card)
+            .SingleOrDefault(bp => bp.Id == id);
+
+        if (binderPage == null) return NotFound();
+        if (!binderPage.IsPublic) return NotFound();
+
+        int? currentProfileId = null;
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (identityUserId != null)
+        {
+            currentProfileId = _dbContext.UserProfiles
+                .Where(up => up.IdentityUserId == identityUserId)
+                .Select(up => (int?)up.Id)
+                .SingleOrDefault();
+        }
+
+        var likeCount = _dbContext.BinderPageLikes.Count(bpl => bpl.BinderPageId == id);
+        var isLikedByMe = currentProfileId != null &&
+            _dbContext.BinderPageLikes.Any(bpl => bpl.BinderPageId == id && bpl.UserProfileId == currentProfileId);
+
+        return Ok(new
+        {
+            binderPage.Id,
+            binderPage.Title,
+            binderPage.Description,
+            binderPage.Rows,
+            binderPage.Columns,
+            binderPage.CreatedAt,
+            binderPage.BinderPageCardSlots,
+            likeCount,
+            isLikedByMe,
+            isOwnPage = currentProfileId != null && binderPage.UserProfileId == currentProfileId
+        });
+    }
+
     // post /api/binderpage
 
     [HttpPost]
@@ -69,6 +112,9 @@ public class BinderPageController : ControllerBase
 
     public IActionResult Create(CreateBinderPageDTO dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Title)) return BadRequest("Title is required.");
+        if (!BinderPageLayouts.IsValid(dto.Rows, dto.Columns)) return BadRequest("Invalid layout.");
+
         var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
@@ -77,17 +123,19 @@ public class BinderPageController : ControllerBase
         {
           Title = dto.Title,
           Description = dto.Description,
+          Rows = dto.Rows,
+          Columns = dto.Columns,
           UserProfileId = profile.Id,
           CreatedAt = DateTime.UtcNow
         };
         _dbContext.BinderPages.Add(binderPage);
         _dbContext.SaveChanges();
 
-        for (int position = 1; position <= 9; position++)
+        for (int position = 1; position <= dto.Rows * dto.Columns; position++)
         {
             _dbContext.BinderPageCardSlots.Add(new BinderPageCardSlot {
               Position = position,
-              BinderPageId = binderPage.Id  
+              BinderPageId = binderPage.Id
             });
         }
         _dbContext.SaveChanges();
@@ -102,6 +150,8 @@ public class BinderPageController : ControllerBase
 
     public IActionResult Update(int id, CreateBinderPageDTO dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Title)) return BadRequest("Title is required.");
+
         var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
         if (profile == null) return NotFound();
@@ -112,10 +162,73 @@ public class BinderPageController : ControllerBase
 
         binderPage.Title = dto.Title;
         binderPage.Description = dto.Description;
+        binderPage.IsPublic = dto.IsPublic;
         _dbContext.SaveChanges();
 
         return NoContent();
 
+    }
+
+    //put /api/binderpage/{id}/layout
+
+    [HttpPut("{id}/layout")]
+    [Authorize]
+
+    public IActionResult UpdateLayout(int id, UpdateLayoutDTO dto)
+    {
+        if (!BinderPageLayouts.IsValid(dto.Rows, dto.Columns)) return BadRequest("Invalid layout.");
+
+        var identityUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var profile = _dbContext.UserProfiles.SingleOrDefault(up => up.IdentityUserId == identityUserId);
+        if (profile == null) return NotFound();
+
+        var binderPage = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+            .SingleOrDefault(bp => bp.Id == id);
+
+        if (binderPage == null) return NotFound();
+        if (binderPage.UserProfileId != profile.Id) return NotFound();
+
+        var newSlotCount = dto.Rows * dto.Columns;
+
+        var slotsToRemove = binderPage.BinderPageCardSlots
+            .Where(slot => slot.Position > newSlotCount)
+            .ToList();
+
+        foreach (var slot in slotsToRemove)
+        {
+            if (slot.CardId != null)
+            {
+                _dbContext.SideboardCards.Add(new SideboardCard
+                {
+                    BinderPageId = binderPage.Id,
+                    CardId = slot.CardId.Value,
+                    AddedAt = DateTime.UtcNow
+                });
+            }
+        }
+        _dbContext.BinderPageCardSlots.RemoveRange(slotsToRemove);
+
+        var currentSlotCount = binderPage.BinderPageCardSlots.Count;
+        for (int position = currentSlotCount + 1; position <= newSlotCount; position++)
+        {
+            _dbContext.BinderPageCardSlots.Add(new BinderPageCardSlot
+            {
+                Position = position,
+                BinderPageId = binderPage.Id
+            });
+        }
+
+        binderPage.Rows = dto.Rows;
+        binderPage.Columns = dto.Columns;
+        _dbContext.SaveChanges();
+
+        var updated = _dbContext.BinderPages
+            .Include(bp => bp.BinderPageCardSlots)
+                .ThenInclude(bpcs => bpcs.Card)
+            .Single(bp => bp.Id == id);
+
+        return Ok(updated);
     }
 
     //delete /api/binderpage/{id}

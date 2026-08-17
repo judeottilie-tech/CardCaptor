@@ -44,9 +44,6 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Register_WithMalformedBase64Password_ReturnsBadRequestNotServerError()
     {
-        // Regression test: Register() used to have no try/catch around the
-        // base64 decode, unlike Login(), so a malformed password crashed
-        // with an unhandled FormatException instead of a controlled response.
         var client = TestAuth.NewClient(_factory);
 
         var response = await client.PostAsJsonAsync("/api/auth/register", new
@@ -100,7 +97,6 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         var firstVisit = TestAuth.NewClient(_factory);
         await firstVisit.SendAsync(LoginRequest("DemoUser", "Demo1234"));
 
-        // A "previous visitor" leaves a mess: an extra binder page, and a fed pet.
         await firstVisit.PostAsJsonAsync("/api/binderpage", new { title = "Some Other Page", description = (string?)null });
         await firstVisit.PostAsync("/api/pet/feed", null);
 

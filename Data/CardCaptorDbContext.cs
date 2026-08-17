@@ -11,6 +11,8 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
     public DbSet<BinderPage> BinderPages { get; set; }
     public DbSet<Card> Cards { get; set; }
     public DbSet<BinderPageCardSlot> BinderPageCardSlots { get; set; }
+    public DbSet<SideboardCard> SideboardCards { get; set; }
+    public DbSet<BinderPageLike> BinderPageLikes { get; set; }
 
     public CardCaptorDbContext(DbContextOptions<CardCaptorDbContext> context) : base(context)
     {
@@ -25,9 +27,9 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             Id = "dbc40bc6-0829-4ac5-a3ed-180f5e916a5f",
             UserName = "Administrator",
             Email = "admin@cardcaptor.comx",
-            ConcurrencyStamp = "1ac5ed5e-321b-43a5-b5cf-601f116f2bc8",
-            SecurityStamp = "d0421a93-dfa7-4b35-9b06-c6254a3482cc",
-            PasswordHash = "AQAAAAIAAYagAAAAELeRD5li3MF+nAJ9iMNI/VKQbd5ZG9hmkK4GCTB98QQA5rRUAustisDll7qQJ6r8Gw=="
+            ConcurrencyStamp = "02a7b74f-8791-44ca-a5de-9df186536535",
+            SecurityStamp = "da5dbabd-64d1-459d-afd7-ffaf17478737",
+            PasswordHash = "AQAAAAIAAYagAAAAED0YJuo3oc5NA8508V9DErvgMXDo9tWsE/tk5CM/YSRKFtvtFxLcV9rK/LrgD2lrGg=="
         });
 
         modelBuilder.Entity<UserProfile>().HasData(new UserProfile
@@ -42,6 +44,10 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
         });
 
         modelBuilder.Entity<Card>().HasIndex(c => c.SourceId).IsUnique();
+
+        modelBuilder.Entity<BinderPageLike>()
+            .HasIndex(bpl => new { bpl.BinderPageId, bpl.UserProfileId })
+            .IsUnique();
 
         modelBuilder.Entity<IdentityUser>().HasData(new IdentityUser
         {
@@ -69,14 +75,12 @@ public class CardCaptorDbContext : IdentityDbContext<IdentityUser>
             Id = 1,
             Title = "Demo Binder",
             CreatedAt = new DateTime(2026, 7, 23),
+            Rows = 3,
+            Columns = 3,
+            IsPublic = false,
             UserProfileId = 2
         });
 
-        // All 9 slots start empty rather than pointing at specific Card ids:
-        // the old hand-seeded 50-card catalog these used to reference (Charizard=4,
-        // Venusaur=15, Blastoise=2, Mewtwo=10) no longer exists on this schema -
-        // cards now come from the live TCGdex import (CardImportService), which
-        // assigns its own ids at import time, not at migration-definition time.
         modelBuilder.Entity<BinderPageCardSlot>().HasData(new BinderPageCardSlot[]
         {
             new BinderPageCardSlot { Id = 1, Position = 1, BinderPageId = 1, CardId = null },

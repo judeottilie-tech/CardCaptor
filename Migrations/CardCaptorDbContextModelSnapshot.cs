@@ -30,11 +30,20 @@ namespace CardCaptor.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Columns")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Rows")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -48,6 +57,18 @@ namespace CardCaptor.Migrations
                     b.HasIndex("UserProfileId");
 
                     b.ToTable("BinderPages");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Columns = 3,
+                            CreatedAt = new DateTime(2026, 7, 23, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsPublic = false,
+                            Rows = 3,
+                            Title = "Demo Binder",
+                            UserProfileId = 2
+                        });
                 });
 
             modelBuilder.Entity("CardCaptor.Models.BinderPageCardSlot", b =>
@@ -74,6 +95,89 @@ namespace CardCaptor.Migrations
                     b.HasIndex("CardId");
 
                     b.ToTable("BinderPageCardSlots");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BinderPageId = 1,
+                            Position = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BinderPageId = 1,
+                            Position = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            BinderPageId = 1,
+                            Position = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            BinderPageId = 1,
+                            Position = 4
+                        },
+                        new
+                        {
+                            Id = 5,
+                            BinderPageId = 1,
+                            Position = 5
+                        },
+                        new
+                        {
+                            Id = 6,
+                            BinderPageId = 1,
+                            Position = 6
+                        },
+                        new
+                        {
+                            Id = 7,
+                            BinderPageId = 1,
+                            Position = 7
+                        },
+                        new
+                        {
+                            Id = 8,
+                            BinderPageId = 1,
+                            Position = 8
+                        },
+                        new
+                        {
+                            Id = 9,
+                            BinderPageId = 1,
+                            Position = 9
+                        });
+                });
+
+            modelBuilder.Entity("CardCaptor.Models.BinderPageLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BinderPageId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("UserProfileId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserProfileId");
+
+                    b.HasIndex("BinderPageId", "UserProfileId")
+                        .IsUnique();
+
+                    b.ToTable("BinderPageLikes");
                 });
 
             modelBuilder.Entity("CardCaptor.Models.Card", b =>
@@ -124,6 +228,32 @@ namespace CardCaptor.Migrations
                     b.ToTable("Cards");
                 });
 
+            modelBuilder.Entity("CardCaptor.Models.SideboardCard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("BinderPageId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CardId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BinderPageId");
+
+                    b.HasIndex("CardId");
+
+                    b.ToTable("SideboardCards");
+                });
+
             modelBuilder.Entity("CardCaptor.Models.UserProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -168,6 +298,16 @@ namespace CardCaptor.Migrations
                             PetFeedCount = 0,
                             PetFullness = 100.0,
                             PetLastFedAt = new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StarterPokemon = "Bulbasaur"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DisplayName = "Demo User",
+                            IdentityUserId = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
+                            PetFeedCount = 0,
+                            PetFullness = 100.0,
+                            PetLastFedAt = new DateTime(2026, 7, 23, 0, 0, 0, 0, DateTimeKind.Utc),
                             StarterPokemon = "Bulbasaur"
                         });
                 });
@@ -300,6 +440,20 @@ namespace CardCaptor.Migrations
                             SecurityStamp = "da5dbabd-64d1-459d-afd7-ffaf17478737",
                             TwoFactorEnabled = false,
                             UserName = "Administrator"
+                        },
+                        new
+                        {
+                            Id = "14e95ce0-ccca-4a12-a26d-6354d318ac70",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "d589739e-9dd7-4586-b3ad-47e17346df25",
+                            Email = "demo@cardcaptor.comx",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "AQAAAAIAAYagAAAAEGfhBSqTZy9X/pudDnRxhjAEo35uUukm2f8FNovsAAIPDt8ZrtzYacz3fdrAQicxgw==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "156d41da-d344-4a10-9d95-31e08decba92",
+                            TwoFactorEnabled = false,
+                            UserName = "DemoUser"
                         });
                 });
 
@@ -406,6 +560,44 @@ namespace CardCaptor.Migrations
                     b.HasOne("CardCaptor.Models.Card", "Card")
                         .WithMany()
                         .HasForeignKey("CardId");
+
+                    b.Navigation("BinderPage");
+
+                    b.Navigation("Card");
+                });
+
+            modelBuilder.Entity("CardCaptor.Models.BinderPageLike", b =>
+                {
+                    b.HasOne("CardCaptor.Models.BinderPage", "BinderPage")
+                        .WithMany()
+                        .HasForeignKey("BinderPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CardCaptor.Models.UserProfile", "UserProfile")
+                        .WithMany()
+                        .HasForeignKey("UserProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BinderPage");
+
+                    b.Navigation("UserProfile");
+                });
+
+            modelBuilder.Entity("CardCaptor.Models.SideboardCard", b =>
+                {
+                    b.HasOne("CardCaptor.Models.BinderPage", "BinderPage")
+                        .WithMany()
+                        .HasForeignKey("BinderPageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CardCaptor.Models.Card", "Card")
+                        .WithMany()
+                        .HasForeignKey("CardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("BinderPage");
 

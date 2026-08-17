@@ -33,7 +33,7 @@ export default function BinderPageList() {
       </div>
       {binderPages.length === 0 ? (
         <p className="inline-flex items-center gap-1.5 text-brand-cream/60">
-          You don't have any binder pages yet — create one to get started.
+          You don't have any binder pages yet!
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -44,7 +44,7 @@ export default function BinderPageList() {
             >
               <Link to={`/binderpages/${bp.id}`} className="min-w-0 flex-1">
                 <p className="font-semibold text-brand-cream hover:text-brand-lavender truncate">
-                  {bp.title}
+                  {bp.title || "Untitled Binder Page"}
                 </p>
                 {bp.description && (
                   <p className="text-sm text-brand-cream/50 truncate mt-0.5">
