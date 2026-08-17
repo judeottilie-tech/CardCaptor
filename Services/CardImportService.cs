@@ -5,8 +5,6 @@ using CardCaptor.Models;
 
 namespace CardCaptor.Services;
 
-// run via: dotnet run -- --import-cards
-
 public class CardImportService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -88,11 +86,6 @@ public class CardImportService
             var detail = await _http.GetFromJsonAsync<TcgdexCardDetail>($"cards/{sourceId}", JsonOptions);
             if (detail == null || detail.Image == null)
             {
-                // TCGdex has no image at all for some cards (seen on the
-                // "Gallery" subsets - Crown Zenith Galarian Gallery, Trainer
-                // Gallery secondary numbering). A card with no art is useless
-                // in a visual binder app, so skip it entirely rather than
-                // importing it with an empty ImageUrl.
                 continue;
             }
 

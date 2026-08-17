@@ -15,8 +15,6 @@ public class CardControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Get_WithZeroPage_DoesNotThrowAndBehavesLikePageOne()
     {
-        // Regression test: page <= 0 used to reach an unclamped Skip() with
-        // a negative count, which EF Core throws on instead of returning data.
         var client = await TestAuth.RegisterAndLoginAsync(_factory);
 
         var zeroPage = await client.GetFromJsonAsync<CardPageResponse>("/api/card?page=0&pageSize=10", TestJson.Options);
@@ -38,9 +36,6 @@ public class CardControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task Get_WithHugePageSize_IsClampedToOneHundred()
     {
-        // Regression test: the whole point of pagination was to stop the
-        // frontend from bursting hundreds of simultaneous image requests, so
-        // pageSize must have a real ceiling regardless of what a client asks for.
         var client = await TestAuth.RegisterAndLoginAsync(_factory);
 
         var response = await client.GetFromJsonAsync<CardPageResponse>("/api/card?pageSize=10000", TestJson.Options);
