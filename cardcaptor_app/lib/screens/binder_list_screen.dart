@@ -24,7 +24,9 @@ class _BinderListScreenState extends State<BinderListScreen> {
   }
 
   void _reload() {
-    setState(() => _futureBinders = _service.getAll());
+    setState(() {
+      _futureBinders = _service.getAll();
+    });
   }
 
   Future<void> _createBinder() async {

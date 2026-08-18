@@ -23,7 +23,9 @@ class _BinderDetailScreenState extends State<BinderDetailScreen> {
   }
 
   void _reload() {
-    setState(() => _futureBinder = _service.getById(widget.binderId));
+    setState(() {
+      _futureBinder = _service.getById(widget.binderId);
+    });
   }
 
   Future<void> _tapSlot(BinderPageCardSlot slot) async {

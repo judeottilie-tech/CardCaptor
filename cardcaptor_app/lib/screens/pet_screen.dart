@@ -24,7 +24,9 @@ class _PetScreenState extends State<PetScreen> {
     setState(() => _feeding = true);
     try {
       final pet = await _service.feed();
-      setState(() => _futurePet = Future.value(pet));
+      setState(() {
+        _futurePet = Future.value(pet);
+      });
       if (pet.evolved && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('${pet.currentPokemon} evolved!')),
