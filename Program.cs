@@ -112,4 +112,6 @@ if (port is not null)
     app.Urls.Add($"http://0.0.0.0:{port}");
 }
 
+app.MapGet("/", () => Results.Ok("CardCaptor API is running"));
+
 app.Run();

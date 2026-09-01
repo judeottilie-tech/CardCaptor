@@ -6,6 +6,13 @@
 # dotenv files
 .env
 
+# Claude Code working notes (not a project deliverable)
+CLAUDE.md
+.claude/
+
+# Stray Flutter scaffold, not part of this project
+flutter_application_1/
+
 # User-specific files
 *.rsuser
 *.suo
