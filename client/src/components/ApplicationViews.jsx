@@ -6,6 +6,8 @@ import Register from './auth/Register'
 import BinderPageList from './binderpages/BinderPageList'
 import BinderPageDetail from './binderpages/BinderPageDetail'
 import CreateBinderPage from './binderpages/CreateBinderPage'
+import PublicProfile from './profile/PublicProfile'
+import PublicBinderPageView from './profile/PublicBinderPageView'
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -59,6 +61,8 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           </GuestRoute>
         }
       />
+      <Route path="u/:userName" element={<PublicProfile />} />
+      <Route path="u/:userName/:id" element={<PublicBinderPageView />} />
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
     </Routes>
   );
