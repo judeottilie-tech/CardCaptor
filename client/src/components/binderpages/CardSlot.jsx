@@ -11,6 +11,7 @@ export default function CardSlot({
   slot,
   onSelect,
   onRemove,
+  onSendToSideboard,
   onPointerDown,
   isDragging,
   isDragOver,
@@ -18,7 +19,7 @@ export default function CardSlot({
   if (slot.card) {
     return (
       <div
-        className={`relative aspect-[5/7] cursor-grab active:cursor-grabbing border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-opacity ${
+        className={`relative min-w-0 min-h-0 aspect-[5/7] cursor-grab active:cursor-grabbing border rounded overflow-hidden hover:bg-brand-blush/20 focus-visible:ring-2 focus-visible:ring-brand-rose transition-opacity ${
           isDragOver
             ? "border-2 border-brand-rose bg-brand-blush/30"
             : "border-brand-periwinkle/30"
@@ -59,13 +60,35 @@ export default function CardSlot({
             <path d="M6 6l12 12M18 6L6 18" />
           </svg>
         </button>
+        <button
+          className="absolute bottom-0 left-0 w-7 h-7 rounded-tr-lg bg-black/40 hover:bg-black/60 border-r border-t border-white/30 opacity-70 hover:opacity-100 flex items-center justify-center transition-colors"
+          aria-label={`Send ${slot.card.name} to sideboard`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onSendToSideboard();
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="w-3.5 h-3.5"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v11M7 12l5 5 5-5" />
+            <path d="M5 19h14" />
+          </svg>
+        </button>
       </div>
     );
   }
 
   return (
     <div
-      className={`aspect-[5/7] border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle focus-visible:ring-2 focus-visible:ring-brand-rose ${
+      className={`min-w-0 min-h-0 aspect-[5/7] border-2 border-dashed rounded flex items-center justify-center cursor-pointer hover:bg-brand-blush/20 text-brand-periwinkle focus-visible:ring-2 focus-visible:ring-brand-rose ${
         isDragOver ? "border-brand-rose bg-brand-blush/30" : "border-brand-periwinkle/40"
       }`}
       role="button"

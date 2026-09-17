@@ -99,6 +99,8 @@ public class AuthController : ControllerBase
         {
             Title = "Demo Binder",
             CreatedAt = DateTime.UtcNow,
+            Rows = 3,
+            Columns = 3,
             UserProfileId = profile.Id
         };
         _dbContext.BinderPages.Add(demoBinder);
